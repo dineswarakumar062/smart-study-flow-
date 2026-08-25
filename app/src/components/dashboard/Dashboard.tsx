@@ -30,9 +30,28 @@ export const Dashboard: React.FC = () => {
   const completedCount = tasks.filter(t => t.completed).length;
   const completionRate = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
 
-  const formatDueDate = (value: string) => {
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? 'No due date' : date.toISOString().split('T')[0];
+  const formatDueDate = (dateStr: string, timeStr?: string) => {
+    if (!dateStr) return 'No due date';
+    const date = new Date(dateStr);
+    const isValid = !Number.isNaN(date.getTime());
+    const dateFormatted = isValid ? date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : dateStr;
+    
+    if (timeStr) {
+      const [h, m] = timeStr.split(':').map(Number);
+      if (!Number.isNaN(h) && !Number.isNaN(m)) {
+        const period = h >= 12 ? 'PM' : 'AM';
+        const hours12 = h % 12 || 12;
+        const minsFormatted = m.toString().padStart(2, '0');
+        return `${dateFormatted} at ${hours12}:${minsFormatted} ${period}`;
+      }
+      return `${dateFormatted} at ${timeStr}`;
+    }
+
+    if (isValid && (date.getHours() !== 0 || date.getMinutes() !== 0)) {
+      return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    }
+
+    return dateFormatted;
   };
 
   // Find today's classes
@@ -89,24 +108,33 @@ export const Dashboard: React.FC = () => {
     <div className="dashboard-page p-3 sm:p-8 max-w-7xl mx-auto space-y-5 sm:space-y-8">
       
       {/* =========================================================================
-          1. HERO BANNER (Pixel Match with Royal Electric Indigo Gradient)
+          1. HERO BANNER (Enhanced Royal Indigo Gradient with Date & Day)
           ========================================================================= */}
-      <div className="hero-banner-gradient text-white rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="hero-banner-gradient text-white rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 border border-white/10">
         <div className="space-y-3 max-w-2xl relative z-10">
-          {/* Top Pill */}
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-bold border border-white/25">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300 fill-current" />
-            <span>{profile.academicYear || 'Current academic term'}</span>
+          
+          {/* Top Badges: Day & Date + Academic Term */}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-black border border-white/25 shadow-xs">
+              <Calendar className="w-3.5 h-3.5 text-amber-300" />
+              <span>{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</span>
+            </div>
+            {profile.academicYear && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-white text-xs font-bold border border-white/20 shadow-xs">
+                <Sparkles className="w-3 h-3 text-amber-300 fill-current" />
+                <span>{profile.academicYear}</span>
+              </div>
+            )}
           </div>
 
           {/* Heading */}
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight font-headline">
-            Welcome back, {profile.name.split(' ')[0] || 'Alex'}! 👋
+            Welcome back, {profile.name.split(' ')[0] || 'Student'}! 👋
           </h2>
 
           {/* Subtitle */}
           <p className="text-white/90 text-sm sm:text-base font-medium leading-relaxed">
-            You have <span className="font-bold underline decoration-white/40">{displayClasses.length} classes</span> scheduled for today and <span className="font-bold underline decoration-white/40">{priorityTasks.length} pending tasks</span>. Stay focused and keep your streak!
+            You have <span className="font-bold underline decoration-white/40">{displayClasses.length} {displayClasses.length === 1 ? 'class' : 'classes'}</span> scheduled for today and <span className="font-bold underline decoration-white/40">{priorityTasks.length} pending {priorityTasks.length === 1 ? 'task' : 'tasks'}</span>. Stay focused and keep your streak!
           </p>
         </div>
 
@@ -117,12 +145,12 @@ export const Dashboard: React.FC = () => {
             className="flex items-center gap-2 bg-white text-indigo-700 hover:bg-slate-50 active:scale-95 px-5 py-3 rounded-2xl font-black text-sm shadow-md transition-all"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
-            <span>+ Add Task</span>
+            <span>Add Task</span>
           </button>
 
           <button
             onClick={() => setActiveTab('timer')}
-            className="flex items-center gap-2 bg-white/20 hover:bg-white/30 active:scale-95 text-white px-5 py-3 rounded-2xl font-bold text-sm border border-white/30 backdrop-blur-md transition-all"
+            className="flex items-center gap-2 bg-white/20 hover:bg-white/30 active:scale-95 text-white px-5 py-3 rounded-2xl font-bold text-sm border border-white/30 backdrop-blur-md transition-all shadow-xs"
           >
             <Timer className="w-4 h-4" />
             <span>Start Focus</span>
@@ -303,7 +331,7 @@ export const Dashboard: React.FC = () => {
                           {t.title}
                         </p>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-                          {t.subject || 'Operating Systems'} • Due {formatDueDate(t.dueDate)}
+                          {t.subject || 'General'} • Due {formatDueDate(t.dueDate, t.dueTime)}
                         </p>
                       </div>
                     </div>

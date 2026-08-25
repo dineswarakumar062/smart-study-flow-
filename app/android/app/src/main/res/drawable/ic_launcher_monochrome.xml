@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Graduation Cap Top -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,34 L82,46 L54,58 L26,46 Z" />
+
+    <!-- Cap Base -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,53 L38,65 C38,71 45,76 54,76 C63,76 70,71 70,65 L70,53 L54,60 Z" />
+
+    <!-- Tassel String -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M54,46 Q74,48 76,60" />
+
+    <!-- Tassel Tip -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M74,60 L78,60 L79,68 L73,68 Z" />
+
+    <!-- Academic Sparkle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M78,32 Q78,38 84,38 Q78,38 78,44 Q78,38 72,38 Q78,38 78,32 Z" />
+</vector>

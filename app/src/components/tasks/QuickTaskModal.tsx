@@ -14,6 +14,7 @@ export const QuickTaskModal: React.FC<QuickTaskModalProps> = ({ open, onClose })
   const [subject, setSubject] = useState('');
   const [priority, setPriority] = useState<TaskPriority>('high');
   const [dueDate, setDueDate] = useState(new Date().toISOString().split('T')[0]);
+  const [dueTime, setDueTime] = useState('17:00');
 
   if (!open) return null;
 
@@ -22,6 +23,7 @@ export const QuickTaskModal: React.FC<QuickTaskModalProps> = ({ open, onClose })
     setSubject('');
     setPriority('high');
     setDueDate(new Date().toISOString().split('T')[0]);
+    setDueTime('17:00');
     onClose();
   };
 
@@ -33,7 +35,8 @@ export const QuickTaskModal: React.FC<QuickTaskModalProps> = ({ open, onClose })
       title: title.trim(),
       subject: subject.trim() || undefined,
       priority,
-      dueDate: new Date(`${dueDate}T12:00:00`).toISOString(),
+      dueDate: dueDate || new Date().toISOString().split('T')[0],
+      dueTime: dueTime || undefined,
       completed: false,
     });
     resetAndClose();
@@ -58,8 +61,8 @@ export const QuickTaskModal: React.FC<QuickTaskModalProps> = ({ open, onClose })
             <input id="quick-task-name" autoFocus required value={title} onChange={(event) => setTitle(event.target.value)} placeholder="e.g. Review chapter 5" className="glass-input" />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="sm:col-span-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
               <label htmlFor="quick-task-subject" className="glass-label">Subject</label>
               <input id="quick-task-subject" value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="Optional" className="glass-input" />
             </div>
@@ -71,9 +74,16 @@ export const QuickTaskModal: React.FC<QuickTaskModalProps> = ({ open, onClose })
                 <option value="low">Low</option>
               </select>
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="quick-task-date" className="glass-label">Due date</label>
+              <label htmlFor="quick-task-date" className="glass-label">Due Date</label>
               <input id="quick-task-date" type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} className="glass-input" />
+            </div>
+            <div>
+              <label htmlFor="quick-task-time" className="glass-label">Due Time</label>
+              <input id="quick-task-time" type="time" value={dueTime} onChange={(event) => setDueTime(event.target.value)} className="glass-input" />
             </div>
           </div>
 

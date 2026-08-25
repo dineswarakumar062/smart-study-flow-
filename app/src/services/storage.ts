@@ -1,4 +1,4 @@
-import type { StudentProfile, TaskItem, NoteItem, ClassSchedule, FocusSession, AppSettings } from '../types';
+import type { StudentProfile, TaskItem, NoteItem, ClassSchedule, FocusSession, AppSettings, AlarmItem, CustomTimerItem } from '../types';
 
 const STORAGE_KEYS = {
   PROFILE: 'studyflow_profile',
@@ -7,6 +7,8 @@ const STORAGE_KEYS = {
   SCHEDULE: 'studyflow_schedule',
   SESSIONS: 'studyflow_sessions',
   SETTINGS: 'studyflow_settings',
+  ALARMS: 'studyflow_alarms',
+  CUSTOM_TIMERS: 'studyflow_custom_timers',
 };
 const PENDING_CLOUD_SYNC_KEY = 'studyflow_pending_cloud_sync';
 
@@ -42,6 +44,7 @@ export const defaultTasks: TaskItem[] = [
     title: 'Finish BST & Binary Tree Assignment',
     description: 'Implement AVL rotation methods and pass all unit tests in Java.',
     dueDate: new Date(Date.now() + 86400000).toISOString(),
+    dueTime: '17:00',
     priority: 'high',
     completed: false,
     subject: 'Data Structures',
@@ -57,6 +60,7 @@ export const defaultTasks: TaskItem[] = [
     title: 'Review Linear Algebra Chapter 4',
     description: 'Eigenvalues, Eigenvectors, and Matrix Diagonalization formulas.',
     dueDate: new Date(Date.now() + 172800000).toISOString(),
+    dueTime: '14:30',
     priority: 'medium',
     completed: false,
     subject: 'Mathematics',
@@ -68,6 +72,7 @@ export const defaultTasks: TaskItem[] = [
     title: 'Submit Operating Systems Lab 2',
     description: 'Process scheduling simulation with Round Robin & Priority Queue.',
     dueDate: new Date(Date.now() + 259200000).toISOString(),
+    dueTime: '23:59',
     priority: 'high',
     completed: true,
     subject: 'Operating Systems',
@@ -79,6 +84,7 @@ export const defaultTasks: TaskItem[] = [
     title: 'Read UX Research Paper on Microinteractions',
     description: 'Summarize key takeaways for Design project.',
     dueDate: new Date(Date.now() + 345600000).toISOString(),
+    dueTime: '11:00',
     priority: 'low',
     completed: false,
     subject: 'UI/UX Design',
@@ -91,18 +97,20 @@ export const defaultNotes: NoteItem[] = [
   {
     id: 'note-1',
     title: 'Data Structures: Tree & Graph Algorithms',
-    content: `# Binary Search Trees & Graphs
-
-Key Properties:
-- Inorder traversal of BST gives sorted key sequence.
-- Time Complexity: O(log N) average for search/insert, O(N) worst case if unbalanced.
-- AVL Trees use height balance factor (-1, 0, +1) to ensure strictly O(log N).
-
-## Graph Search Strategy
-- **BFS**: Queue based, shortest path in unweighted graphs.
-- **DFS**: Stack/Recursion based, topological sorting.
-`,
+    content: `<h2>Binary Search Trees &amp; Graphs</h2>
+<p><strong>Key Properties:</strong></p>
+<ul>
+  <li>Inorder traversal of BST gives sorted key sequence.</li>
+  <li>Time Complexity: <em>O(log N)</em> average for search/insert, <em>O(N)</em> worst case if unbalanced.</li>
+  <li>AVL Trees use height balance factor (-1, 0, +1) to ensure strictly <em>O(log N)</em>.</li>
+</ul>
+<h2>Graph Search Strategy</h2>
+<ul>
+  <li><strong>BFS</strong>: Queue based, shortest path in unweighted graphs.</li>
+  <li><strong>DFS</strong>: Stack/Recursion based, topological sorting.</li>
+</ul>`,
     subject: 'Data Structures',
+    category: 'important',
     tags: ['algorithms', 'midterm', 'cs'],
     isPinned: true,
     createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
@@ -111,19 +119,72 @@ Key Properties:
   {
     id: 'note-2',
     title: 'Linear Algebra Quick Reference Sheet',
-    content: `# Eigenvalues and Diagonalization
-
-$$A v = \\lambda v$$
-
-1. Find characteristic equation: \\det(A - \\lambda I) = 0
-2. Solve for eigenvalues \\lambda_1, \\lambda_2
-3. Find nullspace of (A - \\lambda I) for eigenvectors.
-`,
+    content: `<h2>Eigenvalues and Diagonalization</h2>
+<p><strong>Fundamental Equation:</strong> <em>A v = &lambda; v</em></p>
+<ol>
+  <li>Find characteristic equation: <strong>det(A - &lambda;I) = 0</strong></li>
+  <li>Solve for eigenvalues <em>&lambda;<sub>1</sub>, &lambda;<sub>2</sub></em></li>
+  <li>Find nullspace of <em>(A - &lambda;I)</em> for eigenvectors.</li>
+</ol>`,
     subject: 'Mathematics',
+    category: 'general',
     tags: ['math', 'exam-prep'],
     isPinned: false,
     createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
     updatedAt: new Date(Date.now() - 86400000).toISOString(),
+  },
+];
+
+export const defaultAlarms: AlarmItem[] = [];
+
+export const defaultCustomTimers: CustomTimerItem[] = [
+  {
+    id: 'timer-pomodoro',
+    name: 'Pomodoro Focus',
+    durationMinutes: 25,
+    type: 'focus',
+    colorTheme: 'orange',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'timer-deep-study',
+    name: 'Deep Study Sprint',
+    durationMinutes: 45,
+    type: 'focus',
+    colorTheme: 'purple',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'timer-quick-review',
+    name: 'Quick Revision',
+    durationMinutes: 15,
+    type: 'focus',
+    colorTheme: 'cyan',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'timer-power-hour',
+    name: 'Power Hour',
+    durationMinutes: 60,
+    type: 'focus',
+    colorTheme: 'emerald',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'timer-short-break',
+    name: 'Short Break',
+    durationMinutes: 5,
+    type: 'shortBreak',
+    colorTheme: 'cyan',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'timer-long-break',
+    name: 'Long Recharge',
+    durationMinutes: 15,
+    type: 'longBreak',
+    colorTheme: 'rose',
+    createdAt: new Date().toISOString(),
   },
 ];
 
@@ -281,6 +342,18 @@ export const storage = {
     localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
     notifySync();
   },
+  getAlarms: (): AlarmItem[] => readStored(STORAGE_KEYS.ALARMS, defaultAlarms, isObjectArray) as AlarmItem[],
+  saveAlarms: (alarms: AlarmItem[]) => {
+    localStorage.setItem(STORAGE_KEYS.ALARMS, JSON.stringify(alarms));
+    notifySync();
+  },
+  getCustomTimers: (): CustomTimerItem[] => {
+    return readStored(STORAGE_KEYS.CUSTOM_TIMERS, defaultCustomTimers, isObjectArray) as CustomTimerItem[];
+  },
+  saveCustomTimers: (timers: CustomTimerItem[]) => {
+    localStorage.setItem(STORAGE_KEYS.CUSTOM_TIMERS, JSON.stringify(timers));
+    notifySync();
+  },
   getAllData: () => ({
     profile: storage.getProfile(),
     tasks: storage.getTasks(),
@@ -288,6 +361,8 @@ export const storage = {
     schedule: storage.getSchedule(),
     sessions: storage.getSessions(),
     settings: storage.getSettings(),
+    alarms: storage.getAlarms(),
+    customTimers: storage.getCustomTimers(),
   }),
   hasPendingCloudSync: () => localStorage.getItem(PENDING_CLOUD_SYNC_KEY) === '1',
   clearPendingCloudSync: () => localStorage.removeItem(PENDING_CLOUD_SYNC_KEY),
@@ -308,7 +383,8 @@ export const storage = {
         (parsed.notes !== undefined && !isObjectArray(parsed.notes)) ||
         (parsed.schedule !== undefined && !isObjectArray(parsed.schedule)) ||
         (parsed.sessions !== undefined && !isObjectArray(parsed.sessions)) ||
-        (parsed.settings !== undefined && !isRecord(parsed.settings));
+        (parsed.settings !== undefined && !isRecord(parsed.settings)) ||
+        (parsed.customTimers !== undefined && !isObjectArray(parsed.customTimers));
 
       if (hasInvalidSection) return false;
 
@@ -318,6 +394,8 @@ export const storage = {
       if (parsed.schedule) storage.saveSchedule(parsed.schedule as ClassSchedule[]);
       if (parsed.sessions) storage.saveSessions(parsed.sessions as FocusSession[]);
       if (parsed.settings) storage.saveSettings({ ...defaultSettings, ...parsed.settings });
+      if (parsed.alarms) storage.saveAlarms(parsed.alarms as AlarmItem[]);
+      if (parsed.customTimers) storage.saveCustomTimers(parsed.customTimers as CustomTimerItem[]);
       notifySync();
       return true;
     } catch {

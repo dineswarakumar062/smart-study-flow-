@@ -25,7 +25,8 @@ export interface TaskItem {
   id: string;
   title: string;
   description?: string;
-  dueDate: string; // ISO string
+  dueDate: string; // ISO string or YYYY-MM-DD
+  dueTime?: string; // Optional time string e.g. "14:30" or "02:30 PM"
   priority: TaskPriority;
   completed: boolean;
   subject?: string;
@@ -38,6 +39,7 @@ export interface NoteItem {
   title: string;
   content: string;
   subject: string;
+  category?: 'general' | 'important';
   tags: string[];
   isPinned: boolean;
   createdAt: string;
@@ -62,6 +64,27 @@ export interface FocusSession {
   durationMinutes: number;
   completedAt: string;
   type: 'pomodoro' | 'shortBreak' | 'longBreak' | 'stopwatch';
+}
+
+export type TimerColorTheme = 'orange' | 'cyan' | 'purple' | 'emerald' | 'rose';
+
+export interface CustomTimerItem {
+  id: string;
+  name: string;
+  durationMinutes: number;
+  subject?: string;
+  type: 'focus' | 'shortBreak' | 'longBreak' | 'custom';
+  colorTheme: TimerColorTheme;
+  createdAt: string;
+}
+
+export interface AlarmItem {
+  id: string;
+  label: string;
+  time: string;
+  enabled: boolean;
+  repeat: 'once' | 'daily';
+  createdAt: string;
 }
 
 export interface AppSettings {

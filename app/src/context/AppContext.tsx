@@ -6,11 +6,13 @@ import type {
   NoteItem, 
   ClassSchedule, 
   FocusSession, 
+  AlarmItem,
   AppSettings,
   ThemeMode,
   ThemePreset
 } from '../types';
 import { storage, subscribeToSync } from '../services/storage';
+import { cancelAlarmNotification, scheduleAlarmNotification } from '../services/notifications';
 import {
   firebaseConfigured,
   subscribeToFirebaseAuth,
@@ -44,6 +46,11 @@ interface AppContextType {
   deleteClass: (id: string) => void;
   sessions: FocusSession[];
   logSession: (session: Omit<FocusSession, 'id' | 'completedAt'>) => void;
+  alarms: AlarmItem[];
+  addAlarm: (alarm: Omit<AlarmItem, 'id' | 'createdAt'>) => void;
+  updateAlarm: (id: string, updated: Partial<AlarmItem>) => void;
+  deleteAlarm: (id: string) => void;
+  toggleAlarm: (id: string) => void;
   settings: AppSettings;
   updateSettings: (updated: Partial<AppSettings>) => void;
   toggleThemeMode: () => void;
@@ -73,6 +80,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [notes, setNotes] = useState<NoteItem[]>(storage.getNotes);
   const [schedule, setSchedule] = useState<ClassSchedule[]>(storage.getSchedule);
   const [sessions, setSessions] = useState<FocusSession[]>(storage.getSessions);
+  const [alarms, setAlarms] = useState<AlarmItem[]>(storage.getAlarms);
   const [settings, setSettings] = useState<AppSettings>(storage.getSettings);
 
   const [lastSyncTime, setLastSyncTime] = useState<string>(new Date().toLocaleTimeString());
@@ -87,6 +95,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setNotes(storage.getNotes());
     setSchedule(storage.getSchedule());
     setSessions(storage.getSessions());
+    setAlarms(storage.getAlarms());
     setSettings(storage.getSettings());
     setLastSyncTime(new Date().toLocaleTimeString());
     setTimeout(() => setSyncStatus('synced'), 300);
@@ -261,6 +270,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     storage.saveSessions(updated);
   };
 
+  const addAlarm = (alarm: Omit<AlarmItem, 'id' | 'createdAt'>) => {
+    const newAlarm: AlarmItem = { ...alarm, id: `alarm_${Date.now()}`, createdAt: new Date().toISOString() };
+    const updated = [...alarms, newAlarm];
+    setAlarms(updated);
+    storage.saveAlarms(updated);
+    if (newAlarm.enabled) void scheduleAlarmNotification(newAlarm.id, newAlarm.label, newAlarm.time, newAlarm.repeat);
+  };
+
+  const updateAlarm = (id: string, updatedFields: Partial<AlarmItem>) => {
+    const current = alarms.find(alarm => alarm.id === id);
+    const updated = alarms.map(alarm => alarm.id === id ? { ...alarm, ...updatedFields } : alarm);
+    setAlarms(updated);
+    storage.saveAlarms(updated);
+    void cancelAlarmNotification(id);
+    const next = updated.find(alarm => alarm.id === id);
+    if (next?.enabled) void scheduleAlarmNotification(id, next.label, next.time, next.repeat);
+    else if (current) void cancelAlarmNotification(current.id);
+  };
+
+  const deleteAlarm = (id: string) => {
+    setAlarms(alarms.filter(alarm => alarm.id !== id));
+    storage.saveAlarms(alarms.filter(alarm => alarm.id !== id));
+    void cancelAlarmNotification(id);
+  };
+
+  const toggleAlarm = (id: string) => {
+    const current = alarms.find(alarm => alarm.id === id);
+    if (current) updateAlarm(id, { enabled: !current.enabled });
+  };
+
   const updateSettings = (updated: Partial<AppSettings>) => {
     const newSettings = { ...settings, ...updated };
     newSettings.pomodoroMinutes = Math.min(120, Math.max(1, Number(newSettings.pomodoroMinutes) || 25));
@@ -320,6 +359,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       deleteClass,
       sessions,
       logSession,
+      alarms,
+      addAlarm,
+      updateAlarm,
+      deleteAlarm,
+      toggleAlarm,
       settings,
       updateSettings,
       toggleThemeMode,

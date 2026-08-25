@@ -1,176 +1,138 @@
-# StudyFlow
+# studyzflow 🎓⚡
 
-StudyFlow is a mobile-first academic planner for managing classes, tasks, notes, focus sessions, and study progress in one place.
+**studyzflow** is an intelligent, modern academic productivity suite built with React 19, TypeScript, Tailwind CSS, and Capacitor for Android (Android 14–16 / OriginOS 6) and Web.
 
-## Phase 3 status
+---
 
-The Phase 3 application includes:
+## 📸 Screenshots Showcase
 
-- Dashboard with daily study overview and progress
-- Weekly class schedule with add, edit, and delete support
-- Task and notes workspace
-- Task categories for All, High Priority, Overdue, and Completed
-- Completed tasks sorted to the bottom of the All view
-- Task editing, deletion, subtasks, and completion tracking
-- Full-screen rich note editor with:
-  - Bold, italic, and underline
-  - Headings
-  - Left and center alignment
-  - Bulleted and numbered lists
-  - Tables with visible borders
-  - Checklists
-  - Undo and redo
-- Focus timer with short breaks and completion chime
-- Android timer notifications
-- Light and dark themes with soft lavender styling
-- Responsive mobile layout
-- Local offline storage
-- Firebase Authentication and Firestore realtime synchronization
-- JSON backup export and import
+<p align="center">
+  <img src="./studyflow_dashboard/screen.png" alt="studyzflow Dashboard" width="48%" />
+  <img src="./studyflow_timer&alarm/screen.png" alt="3D Liquid Timer" width="48%" />
+</p>
 
-## Technology
+<p align="center">
+  <img src="./studyflow_notes&tasks 1/screen.png" alt="Tasks & Rich Notes" width="48%" />
+  <img src="./studyflow_shedule/screen.png" alt="Weekly Timetable" width="48%" />
+</p>
 
-- React 19
-- TypeScript
-- Vite
-- Tailwind CSS
-- Capacitor Android
-- Firebase Authentication
-- Cloud Firestore
-- Capacitor Local Notifications
-- Lucide React icons
+<p align="center">
+  <img src="./studyflow_settings/screen.png" alt="Settings & Backup" width="48%" />
+  <img src="./studyflow_tasks&notes(mobile)/screen.png" alt="Mobile Experience" width="48%" />
+</p>
 
-## Requirements
+---
 
-- Node.js 20 or newer
-- npm
-- Android Studio for Android builds
-- Java 17 for Gradle builds
-- An Android phone with USB debugging enabled for direct installation
+## ✨ Phase 4 Highlights & Key Features
 
-## Run the web app
+### 1. 🔮 3D Draining Spherical Liquid Glass Timer
+- **Realistic Physics & Depletion**: The 3D liquid sphere starts **100% full** and smoothly drains down to **0% (empty)** as the countdown completes.
+- **Convex Glass Aesthetics**: Specular highlights, depth rings, rim lighting, glare arcs, and animated rising bubbles.
+- **Color Themes**: Electric Indigo, Sunset Orange, Emerald Focus, Rose Bloom, and Cosmic Violet presets.
+- **Native Alarms**: Configure daily or single-run study alarms with audio chimes.
 
+### 2. 📊 Academic Command Center (Dashboard)
+- **Live Day & Date Display**: Real-time formatted academic calendar pill (`📅 Tuesday, August 25, 2026`).
+- **Quick Schedule & Task Overview**: Daily lecture schedule, pending priority tasks, streak count, and daily focus stats.
+- **Fast Actions**: Quick modal to add tasks or jump straight into study flow.
+
+### 3. 📝 Tasks & Full-Page Rich Note Editor
+- **Date & Time Tracking**: Tasks support due dates with specific due times (e.g. `Aug 25, 2026 at 5:00 PM`).
+- **Enlarged Formatting Toolbar**: Comfortable, high-contrast buttons for Bold, Italic, Underline, Headings (H1/H2), Quotes, Code, Alignment, Lists, Tables, and Checklists.
+- **Subtasks & Categorization**: Subtasks with progress bars, priority flags (Important / General), and tag filtering.
+
+### 4. 📅 Weekly Interactive Timetable
+- Multi-day class schedule with lecture/lab/seminar badges, room numbers, instructors, and custom color accents.
+
+### 5. 🔔 Native Notifications & Permissions
+- **OriginOS 6 & Android 16 Support**: Android 13+ runtime notification permissions and Capacitor Local Notifications.
+- **Instant Test Alerts**: One-tap "Send Test Alert" button in Settings to verify device sound and banner banners.
+
+### 6. 📱 Android 16 & OriginOS 6 Ready
+- **Adaptive Vector Icons**: Clean `ic_launcher_foreground.xml` and `ic_launcher_monochrome.xml` for Material You dynamic theming.
+- Edge-to-edge layout, dark theme optimization, and touch-first interactions.
+
+### 7. ☁️ Real-time Cloud Sync & Offline-First
+- **Firebase Auth & Firestore**: Multi-device live synchronization between PC and Android.
+- **Offline Storage**: Full localStorage fallback with automatic sync replay on reconnection.
+- **JSON Backup**: One-click encrypted JSON workspace export and import.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| **Frontend Framework** | React 19, TypeScript, Vite |
+| **Styling & Effects** | Tailwind CSS, Custom 3D Glassmorphism CSS |
+| **Mobile Runtime** | Capacitor 8 (Android 14, 15, 16 / OriginOS 6) |
+| **Cloud Backend** | Firebase Auth (Email/Password), Cloud Firestore |
+| **Notifications** | `@capacitor/local-notifications`, Web Notifications API |
+| **Icons & Visuals** | Lucide React, Canvas Confetti |
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+- **Node.js**: v20 or newer
+- **npm**: v10 or newer
+- **Android Studio**: Ladybug / Jellyfish with Java 17 (for Android builds)
+
+### 2. Run the Web Application
 ```bash
+# Clone the repository
+git clone https://github.com/dineswarakumar062/smart-study-flow-.git
+cd smart-study-flow-
+
+# Navigate into app and install dependencies
 cd app
 npm install
+
+# Start Vite development server
 npm run dev
 ```
 
-Open the local address shown by Vite in your browser.
-
-## Firebase configuration
-
-Create `app/.env` using `app/.env.example` as a template:
-
+### 3. Firebase Configuration
+Copy `app/.env.example` to `app/.env` and supply your Firebase project credentials:
 ```env
-VITE_FIREBASE_API_KEY=your_firebase_web_api_key
+VITE_FIREBASE_API_KEY=your_firebase_api_key
 VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your-project-id
 VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
-VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
 ```
 
-In Firebase Console:
+Publish Firestore rules from [`firestore.rules`](./firestore.rules) in the Firebase console.
 
-1. Enable Authentication → Email/Password.
-2. Create a Cloud Firestore database.
-3. Publish the rules from [`firestore.rules`](./firestore.rules).
-4. Use the same StudyFlow account on the PC and Android app.
+---
 
-The app stores data locally first. When signed in and online, changes are uploaded automatically to Firestore. When another device opens or reconnects, it receives the latest data through a realtime listener. Offline changes remain locally cached and retry when connectivity returns.
-
-The Sync button is only a manual fallback; normal synchronization does not require pressing it.
-
-## Build the web app
+## 📱 Building & Installing on Android
 
 ```bash
-cd app
-npm run build
-```
-
-The production files are generated in `app/dist`.
-
-## Run on Android
-
-Set Android Studio's Gradle JDK to Java 17:
-
-`Settings → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK`
-
-Then run these commands from the `app` directory:
-
-```bash
+# From the /app directory
 npm run build
 npx cap sync android
 ```
 
-Open this folder in Android Studio:
+1. Open `app/android` in **Android Studio**.
+2. Ensure Gradle JDK is configured to **Java 17** (`Settings → Build Tools → Gradle → Gradle JDK`).
+3. Connect your Android device with USB debugging enabled.
+4. Click **Run** (`Shift + F10`) to build and deploy **studyzflow** directly to your phone.
 
-```text
-app/android
-```
+---
 
-Connect the Android phone with USB debugging enabled, select it in Android Studio, and click **Run**. Android Studio will build and install the latest version over the existing app.
-
-## Notifications
-
-Timer notifications use the Android local notification system. On Android, allow notifications in the app's Settings page and in the phone's system settings if prompted.
-
-Notifications are device-local. This prevents the same timer from creating duplicate alerts on both the PC and phone.
-
-## Data model
-
-Each Firebase account uses one protected document:
-
-```text
-users/{userId}
-```
-
-The document contains the user's profile, tasks, notes, schedule, focus sessions, and settings. Firestore rules allow users to read and write only their own document.
-
-## Useful commands
+## 📋 Useful Commands
 
 ```bash
 cd app
-npm run dev       # Start development server
-npm run build     # Type-check and create production build
-npm run lint      # Run lint checks
-npx cap sync android  # Copy the latest web build into Android
+npm run dev           # Start Vite hot-reload server
+npm run build         # Type-check and build production assets
+npx cap sync android  # Sync web build and plugins to Android
 ```
 
-## Troubleshooting
+---
 
-### Firebase says `auth/api-key-not-valid`
-
-Copy the exact `apiKey` from Firebase Console → Project settings → Your apps → SDK setup and configuration, update `app/.env`, and restart the Vite server.
-
-### Capacitor says Android has not been added
-
-Run the command from `app`, not from `app/android`:
-
-```bash
-cd app
-npx cap sync android
-```
-
-### Gradle cannot find Java
-
-Install Java 17 and set Android Studio's Gradle JDK to Java 17. Android Studio's bundled JDK may be newer than this project's Android tooling supports.
-
-### Changes do not appear on another device
-
-Confirm that both devices:
-
-- Are signed in with the same Firebase account
-- Have internet access
-- Have Firestore created and its rules published
-- Are running a build that includes the current `app/.env` configuration
-
-## Security notes
-
-Firebase web configuration values are designed to be used in client applications. Data protection comes from Firebase Authentication and Firestore security rules. Never place Firebase service-account private keys in the frontend or commit them to GitHub.
-
-## License
-
-Add a project license before publishing this repository publicly.
+## 📄 License
+MIT License. Created for students and lifelong learners.
