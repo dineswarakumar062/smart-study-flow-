@@ -7,19 +7,19 @@
 ## 📸 Screenshots Showcase
 
 <p align="center">
-  <img src="./studyflow_dashboard/screen.png" alt="studyzflow Dashboard" width="48%" />
-  <img src="./studyflow_timer&alarm/screen.png" alt="3D Liquid Timer" width="48%" />
+  <img src="<img width="387" height="861" alt="image" src="https://github.com/user-attachments/assets/a0784fd9-b4ed-4340-8514-514c5a2306c0" />
+" />
+  <img src="<img width="390" height="852" alt="image" src="https://github.com/user-attachments/assets/200c301c-e87d-46eb-89b8-1ac9d2d2c600" />
+" />
 </p>
 
 <p align="center">
-  <img src="./studyflow_notes&tasks 1/screen.png" alt="Tasks & Rich Notes" width="48%" />
-  <img src="./studyflow_shedule/screen.png" alt="Weekly Timetable" width="48%" />
+  <img src="<img width="381" height="851" alt="image" src="https://github.com/user-attachments/assets/55365c7d-07e0-491f-825e-1f588844e318" />
+" />
+  <img src="<img width="382" height="852" alt="image" src="https://github.com/user-attachments/assets/9a601847-4353-41b8-91e1-f8286d3a355b" />
+%" />
 </p>
 
-<p align="center">
-  <img src="./studyflow_settings/screen.png" alt="Settings & Backup" width="48%" />
-  <img src="./studyflow_tasks&notes(mobile)/screen.png" alt="Mobile Experience" width="48%" />
-</p>
 
 ---
 
