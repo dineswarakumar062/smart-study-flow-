@@ -86,6 +86,7 @@ export function startFirebaseRealtimeSync(
   let stopDocument: Unsubscribe | null = null;
   let stopLocalChanges: (() => void) | null = null;
   let applyingRemote = false;
+  let activeUid: string | null = null;
 
   const publish = async (uid: string) => {
     if (!database || applyingRemote) return;
@@ -96,6 +97,7 @@ export function startFirebaseRealtimeSync(
         updatedAt: serverTimestamp(),
         updatedBy: storage.getSettings().deviceSyncId,
       });
+      storage.clearPendingCloudSync();
       onStatus('synced');
     } catch {
       onStatus('offline');
@@ -108,6 +110,7 @@ export function startFirebaseRealtimeSync(
     stopDocument = null;
     stopLocalChanges = null;
 
+    activeUid = user?.uid ?? null;
     if (!user || !database) {
       onStatus('offline');
       return;
@@ -116,9 +119,14 @@ export function startFirebaseRealtimeSync(
     onStatus('syncing');
     const userDocument = doc(database, 'users', user.uid);
     stopDocument = onSnapshot(userDocument, snapshot => {
+      if (storage.hasPendingCloudSync()) {
+        void publish(user.uid);
+        return;
+      }
       if (snapshot.exists()) {
         applyingRemote = true;
         onRemoteData(JSON.stringify(snapshot.data()));
+        storage.clearPendingCloudSync();
         queueMicrotask(() => { applyingRemote = false; });
       } else {
         void publish(user.uid);
@@ -131,9 +139,15 @@ export function startFirebaseRealtimeSync(
     });
   });
 
+  const handleOnline = () => {
+    if (activeUid) void publish(activeUid);
+  };
+  window.addEventListener('online', handleOnline);
+
   return () => {
     stopAuth();
     stopDocument?.();
     stopLocalChanges?.();
+    window.removeEventListener('online', handleOnline);
   };
 }

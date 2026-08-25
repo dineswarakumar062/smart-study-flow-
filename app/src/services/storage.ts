@@ -8,6 +8,7 @@ const STORAGE_KEYS = {
   SESSIONS: 'studyflow_sessions',
   SETTINGS: 'studyflow_settings',
 };
+const PENDING_CLOUD_SYNC_KEY = 'studyflow_pending_cloud_sync';
 
 const localChangeListeners = new Set<() => void>();
 
@@ -288,6 +289,8 @@ export const storage = {
     sessions: storage.getSessions(),
     settings: storage.getSettings(),
   }),
+  hasPendingCloudSync: () => localStorage.getItem(PENDING_CLOUD_SYNC_KEY) === '1',
+  clearPendingCloudSync: () => localStorage.removeItem(PENDING_CLOUD_SYNC_KEY),
   exportAllData: () => {
     return JSON.stringify({
       ...storage.getAllData(),
@@ -334,6 +337,7 @@ const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in windo
   : null;
 
 function notifySync() {
+  localStorage.setItem(PENDING_CLOUD_SYNC_KEY, '1');
   localChangeListeners.forEach(listener => listener());
   if (syncChannel) {
     syncChannel.postMessage({ type: 'SYNC_UPDATE', timestamp: Date.now() });
