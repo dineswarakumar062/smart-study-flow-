@@ -43,23 +43,24 @@ export const Profile: React.FC = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-10 border border-slate-200/80 dark:border-slate-800 shadow-md space-y-8">
+      <form onSubmit={handleSubmit} className="relative overflow-hidden rounded-3xl p-6 sm:p-10 border border-indigo-200/90 dark:border-indigo-800/60 bg-gradient-to-br from-indigo-50/95 via-purple-50/50 to-white/95 dark:from-indigo-950/45 dark:via-purple-950/25 dark:to-slate-900/90 shadow-2xl shadow-indigo-500/10 space-y-8">
+        <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-gradient-to-br from-indigo-400/20 to-purple-500/20 dark:from-indigo-500/15 dark:to-purple-500/10 blur-3xl pointer-events-none" />
         
         {/* Student Badge Card Header */}
-        <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-100 dark:border-slate-800">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-[#4338ca] to-[#6366f1] text-white flex items-center justify-center font-black text-3xl font-headline shadow-lg shadow-indigo-600/25">
-            {name.charAt(0) || 'A'}
+        <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-indigo-100/90 dark:border-slate-800 relative z-10">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-[#4338ca] to-[#6366f1] text-white flex items-center justify-center font-black text-3xl font-headline shadow-lg shadow-indigo-600/25 shrink-0">
+            {name.charAt(0) || 'S'}
           </div>
 
           <div className="space-y-1 text-center sm:text-left">
             <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block">Official Academic Record</span>
-            <h3 className="text-3xl font-black text-slate-900 dark:text-white font-headline">{name || 'Alex Vance'}</h3>
-            <p className="text-xs font-bold text-slate-500 dark:text-slate-400">{major || 'Computer Science'} • {academicYear || 'Junior (Year 3)'}</p>
+            <h3 className="text-3xl font-black text-slate-900 dark:text-white font-headline">{name || 'Student Profile'}</h3>
+            <p className="text-xs font-bold text-slate-500 dark:text-slate-400">{major || 'Specialization'} • {academicYear || 'Academic Year'}</p>
           </div>
         </div>
 
         {/* Basic Info Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
           <div>
             <label className="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
               <User className="w-3.5 h-3.5 text-indigo-600" />
@@ -70,7 +71,8 @@ export const Profile: React.FC = () => {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-slate-200 dark:border-slate-700 focus:border-indigo-600 focus:outline-none font-bold shadow-xs"
+              placeholder="Your full name"
+              className="w-full bg-white/85 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-indigo-100 dark:border-slate-700 focus:border-indigo-600 focus:outline-none font-bold shadow-xs"
             />
           </div>
 
@@ -84,7 +86,8 @@ export const Profile: React.FC = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-slate-200 dark:border-slate-700 focus:border-indigo-600 focus:outline-none font-bold shadow-xs"
+              placeholder="student@university.edu"
+              className="w-full bg-white/85 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-indigo-100 dark:border-slate-700 focus:border-indigo-600 focus:outline-none font-bold shadow-xs"
             />
           </div>
 
@@ -98,7 +101,8 @@ export const Profile: React.FC = () => {
               required
               value={major}
               onChange={(e) => setMajor(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-slate-200 dark:border-slate-700 focus:border-indigo-600 focus:outline-none font-bold shadow-xs"
+              placeholder="e.g. Computer Science & Engineering"
+              className="w-full bg-white/85 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-indigo-100 dark:border-slate-700 focus:border-indigo-600 focus:outline-none font-bold shadow-xs"
             />
           </div>
 
@@ -111,8 +115,8 @@ export const Profile: React.FC = () => {
               type="text"
               value={academicYear}
               onChange={(e) => setAcademicYear(e.target.value)}
-              placeholder="e.g. Junior (Year 3)"
-              className="w-full bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-slate-200 dark:border-slate-700 focus:border-indigo-600 focus:outline-none font-bold shadow-xs"
+              placeholder="e.g. 3rd Year / Semester 5"
+              className="w-full bg-white/85 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-indigo-100 dark:border-slate-700 focus:border-indigo-600 focus:outline-none font-bold shadow-xs"
             />
           </div>
 
@@ -125,7 +129,8 @@ export const Profile: React.FC = () => {
               type="text"
               value={targetGpa}
               onChange={(e) => setTargetGpa(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-slate-200 dark:border-slate-700 focus:border-indigo-600 focus:outline-none font-bold shadow-xs"
+              placeholder="e.g. 3.9"
+              className="w-full bg-white/85 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-indigo-100 dark:border-slate-700 focus:border-indigo-600 focus:outline-none font-bold shadow-xs"
             />
           </div>
 
@@ -140,24 +145,26 @@ export const Profile: React.FC = () => {
               max={100}
               value={weeklyGoalHours}
               onChange={(e) => setWeeklyGoalHours(Number(e.target.value))}
-              className="w-full bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-slate-200 dark:border-slate-700 focus:border-indigo-600 focus:outline-none font-bold shadow-xs"
+              placeholder="25"
+              className="w-full bg-white/85 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-indigo-100 dark:border-slate-700 focus:border-indigo-600 focus:outline-none font-bold shadow-xs"
             />
           </div>
         </div>
 
         {/* Bio */}
-        <div>
+        <div className="relative z-10">
           <label className="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Student Academic Focus & Bio</label>
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             rows={4}
-            className="w-full bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-slate-200 dark:border-slate-700 focus:border-indigo-600 focus:outline-none resize-none font-medium leading-relaxed shadow-xs"
+            placeholder="Write your academic goals, research interests, or study notes..."
+            className="w-full bg-white/85 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 px-4 text-sm border border-indigo-100 dark:border-slate-700 focus:border-indigo-600 focus:outline-none resize-none font-medium leading-relaxed shadow-xs"
           />
         </div>
 
         {/* Submit */}
-        <div className="flex justify-end pt-2">
+        <div className="flex justify-end pt-2 relative z-10">
           <button
             type="submit"
             className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-[#4338ca] hover:bg-[#3730a3] text-white font-black text-sm shadow-md shadow-indigo-600/25 active:scale-95 transition-all"

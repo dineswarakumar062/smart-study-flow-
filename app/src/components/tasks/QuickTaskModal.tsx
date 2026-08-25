@@ -43,9 +43,11 @@ export const QuickTaskModal: React.FC<QuickTaskModalProps> = ({ open, onClose })
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/28 p-4" role="dialog" aria-modal="true" aria-labelledby="quick-task-title">
-      <div className="liquid-glass-panel w-full max-w-lg rounded-[2rem] p-6 shadow-2xl sm:p-8">
-        <div className="mb-6 flex items-center justify-between gap-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/30 backdrop-blur-xs p-4" role="dialog" aria-modal="true" aria-labelledby="quick-task-title">
+      <div className="relative overflow-hidden w-full max-w-lg rounded-[2rem] p-6 sm:p-8 shadow-2xl border border-indigo-200/90 dark:border-indigo-800/60 bg-gradient-to-br from-indigo-50/95 via-purple-50/50 to-white/95 dark:from-indigo-950/45 dark:via-purple-950/25 dark:to-slate-900/90">
+        <div className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-indigo-400/20 dark:bg-indigo-500/10 blur-2xl pointer-events-none" />
+        
+        <div className="mb-6 flex items-center justify-between gap-4 relative z-10">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-600 dark:text-indigo-300">Quick capture</p>
             <h3 id="quick-task-title" className="mt-1 text-2xl font-black text-slate-950 dark:text-white">Add a new task</h3>
@@ -55,16 +57,16 @@ export const QuickTaskModal: React.FC<QuickTaskModalProps> = ({ open, onClose })
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
           <div>
             <label htmlFor="quick-task-name" className="glass-label">Task title</label>
-            <input id="quick-task-name" autoFocus required value={title} onChange={(event) => setTitle(event.target.value)} placeholder="e.g. Review chapter 5" className="glass-input" />
+            <input id="quick-task-name" autoFocus required value={title} onChange={(event) => setTitle(event.target.value)} placeholder="e.g. Complete math problem set" className="glass-input" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label htmlFor="quick-task-subject" className="glass-label">Subject</label>
-              <input id="quick-task-subject" value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="Optional" className="glass-input" />
+              <input id="quick-task-subject" value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="Optional (e.g. Mathematics)" className="glass-input" />
             </div>
             <div>
               <label htmlFor="quick-task-priority" className="glass-label">Priority</label>

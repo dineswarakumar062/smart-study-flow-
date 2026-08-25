@@ -159,16 +159,17 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* =========================================================================
-          2. METRICS ROW: 4 STAT CARDS (Bright Icons & Crisp Labels)
+          2. METRICS ROW: 4 VIBRANT STAT CARDS (Luminous Aurora Glass)
           ========================================================================= */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         
-        {/* Card 1: Study Streak */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4 transition-transform hover:scale-[1.02]">
-          <div className="w-12 h-12 rounded-2xl bg-amber-100/90 dark:bg-amber-950/70 text-amber-500 flex items-center justify-center shadow-xs shrink-0">
+        {/* Card 1: Study Streak (Vibrant Amber Aurora) */}
+        <div className="relative overflow-hidden rounded-3xl p-5 sm:p-6 border border-amber-200/90 dark:border-amber-800/60 bg-gradient-to-br from-amber-50/95 via-orange-50/50 to-white/95 dark:from-amber-950/40 dark:via-orange-950/25 dark:to-slate-900/90 shadow-xl shadow-amber-500/5 flex items-center gap-4 transition-all hover:scale-[1.02]">
+          <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-amber-400/20 dark:bg-amber-500/10 blur-xl pointer-events-none" />
+          <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 flex items-center justify-center shadow-xs shrink-0 border border-amber-200/60 relative z-10">
             <Flame className="w-6 h-6 fill-amber-500 text-amber-500" />
           </div>
-          <div>
+          <div className="relative z-10">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Study Streak</span>
             <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-headline mt-0.5 block">
               {studyStreak} {studyStreak === 1 ? 'Day' : 'Days'}
@@ -176,12 +177,13 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 2: Today's Classes */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4 transition-transform hover:scale-[1.02]">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-100/90 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-xs shrink-0">
+        {/* Card 2: Today's Classes (Vibrant Indigo Aurora) */}
+        <div className="relative overflow-hidden rounded-3xl p-5 sm:p-6 border border-indigo-200/90 dark:border-indigo-800/60 bg-gradient-to-br from-indigo-50/95 via-purple-50/50 to-white/95 dark:from-indigo-950/40 dark:via-purple-950/25 dark:to-slate-900/90 shadow-xl shadow-indigo-500/5 flex items-center gap-4 transition-all hover:scale-[1.02]">
+          <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-indigo-400/20 dark:bg-indigo-500/10 blur-xl pointer-events-none" />
+          <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-300 flex items-center justify-center shadow-xs shrink-0 border border-indigo-200/60 relative z-10">
             <BookOpen className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
           </div>
-          <div>
+          <div className="relative z-10">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Today's Classes</span>
             <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-headline mt-0.5 block">
               {displayClasses.length}
@@ -189,12 +191,13 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 3: Tasks Done */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4 transition-transform hover:scale-[1.02]">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-100/90 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shadow-xs shrink-0">
+        {/* Card 3: Tasks Done (Vibrant Emerald Aurora) */}
+        <div className="relative overflow-hidden rounded-3xl p-5 sm:p-6 border border-emerald-200/90 dark:border-emerald-800/60 bg-gradient-to-br from-emerald-50/95 via-teal-50/50 to-white/95 dark:from-emerald-950/40 dark:via-teal-950/25 dark:to-slate-900/90 shadow-xl shadow-emerald-500/5 flex items-center gap-4 transition-all hover:scale-[1.02]">
+          <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-emerald-400/20 dark:bg-emerald-500/10 blur-xl pointer-events-none" />
+          <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-300 flex items-center justify-center shadow-xs shrink-0 border border-emerald-200/60 relative z-10">
             <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <div>
+          <div className="relative z-10">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Tasks Done</span>
             <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-headline mt-0.5 block">
               {completionRate}%
@@ -202,12 +205,13 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 4: Target GPA */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4 transition-transform hover:scale-[1.02]">
-          <div className="w-12 h-12 rounded-2xl bg-purple-100/90 dark:bg-purple-950/70 text-purple-600 dark:text-purple-400 flex items-center justify-center shadow-xs shrink-0">
+        {/* Card 4: Target GPA (Vibrant Cosmic Purple Aurora) */}
+        <div className="relative overflow-hidden rounded-3xl p-5 sm:p-6 border border-purple-200/90 dark:border-purple-800/60 bg-gradient-to-br from-purple-50/95 via-fuchsia-50/50 to-white/95 dark:from-purple-950/40 dark:via-fuchsia-950/25 dark:to-slate-900/90 shadow-xl shadow-purple-500/5 flex items-center gap-4 transition-all hover:scale-[1.02]">
+          <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-purple-400/20 dark:bg-purple-500/10 blur-xl pointer-events-none" />
+          <div className="w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-300 flex items-center justify-center shadow-xs shrink-0 border border-purple-200/60 relative z-10">
             <Target className="w-6 h-6 text-purple-600 dark:text-purple-400" />
           </div>
-          <div>
+          <div className="relative z-10">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Target GPA</span>
             <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-headline mt-0.5 block">
               {profile.targetGpa || '3.9'}
@@ -251,7 +255,7 @@ export const Dashboard: React.FC = () => {
               return (
                 <div
                   key={item.id}
-                  className="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between gap-4 transition-all hover:border-indigo-300 dark:hover:border-indigo-700"
+                  className="relative overflow-hidden rounded-3xl p-4 sm:p-5 border border-indigo-100/90 dark:border-indigo-900/40 bg-gradient-to-r from-white/95 via-indigo-50/30 to-white/95 dark:from-slate-900/90 dark:via-slate-800/80 dark:to-slate-900/90 shadow-md flex items-center justify-between gap-4 transition-all hover:border-indigo-400 dark:hover:border-indigo-600"
                 >
                   <div className="flex items-center gap-4 min-w-0">
                     {/* High-Contrast Color Code Badge */}
@@ -282,7 +286,7 @@ export const Dashboard: React.FC = () => {
                   </div>
 
                   {/* Right Type Tag */}
-                  <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700 shrink-0">
+                  <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60 shrink-0">
                     {badge.pill}
                   </span>
                 </div>
@@ -295,29 +299,34 @@ export const Dashboard: React.FC = () => {
         {/* Right Column: Priority Tasks & Upcoming Exam Card (Span 5) */}
         <div className="lg:col-span-5 space-y-6">
           
-          {/* Priority Tasks Card */}
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+          {/* Priority Tasks Card (Vibrant Sky/Indigo Aurora) */}
+          <div className="relative overflow-hidden rounded-3xl p-6 border border-sky-200/90 dark:border-sky-800/60 bg-gradient-to-br from-sky-50/95 via-indigo-50/50 to-white/95 dark:from-sky-950/40 dark:via-indigo-950/25 dark:to-slate-900/90 shadow-xl shadow-sky-500/5 space-y-4">
+            
+            <div className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-sky-400/20 dark:bg-sky-500/10 blur-2xl pointer-events-none" />
+
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-sky-100 dark:bg-sky-950/80 text-sky-600 dark:text-sky-300 flex items-center justify-center border border-sky-200/60">
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
                 <h3 className="text-lg font-black text-slate-900 dark:text-white font-headline">Priority Tasks</h3>
               </div>
               <button
                 onClick={() => setActiveTab('notes')}
-                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                className="text-xs font-bold text-sky-700 dark:text-sky-300 hover:underline"
               >
                 All ({priorityTasks.length})
               </button>
             </div>
 
             {priorityTasks.length === 0 ? (
-              <p className="text-xs text-slate-400 py-4 text-center">All tasks completed! 🎉</p>
+              <p className="text-xs text-slate-500 py-4 text-center relative z-10 font-bold">All tasks completed! 🎉</p>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-3 relative z-10">
                 {priorityTasks.slice(0, 2).map((t) => (
                   <div
                     key={t.id}
-                    className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100/80 dark:hover:bg-slate-800 transition-all border border-slate-200/80 dark:border-slate-700 flex items-start justify-between gap-3 group"
+                    className="p-4 rounded-2xl bg-white/85 dark:bg-slate-800/85 hover:bg-white dark:hover:bg-slate-800 transition-all border border-sky-200/60 dark:border-slate-700 flex items-start justify-between gap-3 group shadow-xs"
                   >
                     <div className="flex items-start gap-3 min-w-0">
                       <input

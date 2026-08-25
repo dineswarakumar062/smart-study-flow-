@@ -88,16 +88,48 @@ export const Schedule: React.FC = () => {
       </div>
 
       {selectedClasses.length === 0 ? (
-        <div className="flex min-h-[31rem] flex-col items-center justify-center text-center">
-          <div className="schedule-empty-icon liquid-glass-panel flex h-36 w-36 items-center justify-center rounded-[2rem]"><CalendarDays className="h-14 w-14 text-slate-500 dark:text-slate-300" /></div>
-          <h2 className="mt-8 text-2xl font-black text-slate-950 dark:text-white">No classes on this day</h2>
-          <p className="mt-3 max-w-sm text-base font-semibold leading-relaxed text-slate-500 dark:text-slate-400">Add a course with its weekly schedule and sessions will appear here automatically.</p>
-          <button type="button" onClick={openAddClassModal} className="glass-dark-button mt-8 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm"><Plus className="h-5 w-5" />Add Course</button>
+        <div className="flex min-h-[31rem] flex-col items-center justify-center text-center relative overflow-hidden rounded-3xl p-8 border border-indigo-200/80 dark:border-indigo-800/60 bg-gradient-to-br from-indigo-50/80 via-purple-50/40 to-white/95 dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-slate-900/90 shadow-xl shadow-indigo-500/5 mt-6">
+          <div className="schedule-empty-icon flex h-32 w-32 items-center justify-center rounded-3xl bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 shadow-md">
+            <CalendarDays className="h-12 w-12" />
+          </div>
+          <h2 className="mt-6 text-2xl font-black text-slate-950 dark:text-white">No classes on this day</h2>
+          <p className="mt-2 max-w-sm text-sm font-semibold leading-relaxed text-slate-500 dark:text-slate-400">Add a course with its weekly schedule and sessions will appear here automatically.</p>
+          <button type="button" onClick={openAddClassModal} className="glass-primary-button mt-6 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-black shadow-md"><Plus className="h-5 w-5" />Add Course</button>
         </div>
       ) : (
-        <section className="mt-10 space-y-4">
-          <div className="flex items-center justify-between"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-600 dark:text-indigo-300">Your day</p><h2 className="mt-1 text-2xl font-black text-slate-950 dark:text-white">{selectedClasses.length} {selectedClasses.length === 1 ? 'class' : 'classes'}</h2></div><button type="button" onClick={openAddClassModal} className="glass-primary-button inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm"><Plus className="h-4 w-4" />Add Course</button></div>
-          <div className="space-y-3">{selectedClasses.map(item => <article key={item.id} style={{ borderRightColor: item.color, borderRightWidth: '5px' }} className="schedule-card liquid-glass-panel flex items-center justify-between gap-4 rounded-3xl p-5"><div className="min-w-0"><div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300"><Clock className="h-4 w-4" />{item.startTime} – {item.endTime}</div><h3 className="mt-2 truncate text-xl font-black text-slate-950 dark:text-white">{item.subjectName}</h3><div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold text-slate-500 dark:text-slate-400"><span>{item.code || 'Course'}</span><span><MapPin className="mr-1 inline h-3.5 w-3.5" />{item.location}</span><span><User className="mr-1 inline h-3.5 w-3.5" />{item.instructor}</span></div></div><div className="flex shrink-0 items-center gap-1"><button type="button" onClick={() => openEditClassModal(item)} aria-label={`Edit ${item.subjectName}`} className="glass-icon-button"><Edit2 className="h-4 w-4" /></button><button type="button" onClick={() => deleteClass(item.id)} aria-label={`Delete ${item.subjectName}`} className="glass-icon-button text-rose-500"><Trash2 className="h-4 w-4" /></button></div></article>)}</div>
+        <section className="mt-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-600 dark:text-indigo-300">Your day</p>
+              <h2 className="mt-1 text-2xl font-black text-slate-950 dark:text-white">{selectedClasses.length} {selectedClasses.length === 1 ? 'class' : 'classes'}</h2>
+            </div>
+            <button type="button" onClick={openAddClassModal} className="glass-primary-button inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-black shadow-md"><Plus className="h-4 w-4" />Add Course</button>
+          </div>
+          <div className="space-y-3">
+            {selectedClasses.map(item => (
+              <article 
+                key={item.id} 
+                style={{ borderRightColor: item.color, borderRightWidth: '5px' }} 
+                className="schedule-card relative overflow-hidden rounded-3xl p-5 border border-indigo-100/90 dark:border-slate-800 bg-gradient-to-r from-white/95 via-indigo-50/30 to-white/95 dark:from-slate-900/90 dark:via-slate-800/80 dark:to-slate-900/90 shadow-md flex items-center justify-between gap-4 transition-all hover:border-indigo-400 dark:hover:border-indigo-600"
+              >
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300">
+                    <Clock className="h-4 w-4" />{item.startTime} – {item.endTime}
+                  </div>
+                  <h3 className="mt-2 truncate text-xl font-black text-slate-950 dark:text-white">{item.subjectName}</h3>
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    <span className="font-bold text-indigo-700 dark:text-indigo-300">{item.code || 'Course'}</span>
+                    <span><MapPin className="mr-1 inline h-3.5 w-3.5" />{item.location}</span>
+                    <span><User className="mr-1 inline h-3.5 w-3.5" />{item.instructor}</span>
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <button type="button" onClick={() => openEditClassModal(item)} aria-label={`Edit ${item.subjectName}`} className="glass-icon-button"><Edit2 className="h-4 w-4" /></button>
+                  <button type="button" onClick={() => deleteClass(item.id)} aria-label={`Delete ${item.subjectName}`} className="glass-icon-button text-rose-500"><Trash2 className="h-4 w-4" /></button>
+                </div>
+              </article>
+            ))}
+          </div>
         </section>
       )}
 

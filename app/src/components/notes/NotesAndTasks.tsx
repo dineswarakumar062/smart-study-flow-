@@ -596,12 +596,12 @@ export const NotesAndTasks: React.FC = () => {
                   key={n.id}
                   onClick={() => openNoteForEditing(n)}
                   style={{ borderLeftColor: getCardAccent(n.subject), borderLeftWidth: '5px' }}
-                  className="relative overflow-hidden bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-400 bouncy-hover cursor-pointer flex flex-col justify-between space-y-4 group shadow-sm transition-all"
+                  className="relative overflow-hidden rounded-3xl p-6 border border-indigo-200/90 dark:border-indigo-800/50 bg-gradient-to-br from-indigo-50/90 via-purple-50/40 to-white/95 dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-slate-900/90 hover:border-indigo-400 bouncy-hover cursor-pointer flex flex-col justify-between space-y-4 group shadow-md hover:shadow-xl transition-all"
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-xs font-black px-3 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50">
+                        <span className="text-xs font-black px-3 py-1 rounded-xl bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-900/60">
                           {n.subject}
                         </span>
                         {n.category === 'important' && (
@@ -638,12 +638,12 @@ export const NotesAndTasks: React.FC = () => {
                     </h3>
 
                     {/* Clean plain-text preview without raw HTML tags */}
-                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed opacity-90 font-normal">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed opacity-90 font-normal">
                       {getNotePlainTextPreview(n.content)}
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                  <div className="pt-3 border-t border-indigo-100/80 dark:border-slate-800 flex items-center justify-between">
                     <div className="flex items-center gap-1 flex-wrap">
                       {n.tags.slice(0, 3).map(t => (
                         <button
@@ -655,7 +655,7 @@ export const NotesAndTasks: React.FC = () => {
                           className={`text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-0.5 transition-colors ${
                             activeTagFilter === t 
                               ? 'bg-indigo-600 text-white' 
-                              : 'bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950'
+                              : 'bg-white/80 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 border border-indigo-200/50 dark:border-slate-700'
                           }`}
                           title={`Filter by #${t}`}
                         >
@@ -679,32 +679,34 @@ export const NotesAndTasks: React.FC = () => {
           )}
         </div>
       ) : (
-        /* TASKS TO-DO LIST VIEW */
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
-          <div className="flex items-center justify-between">
+        /* TASKS TO-DO LIST VIEW (Vibrant Sky/Indigo Aurora Glass) */
+        <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-sky-200/90 dark:border-sky-800/60 bg-gradient-to-br from-sky-50/95 via-indigo-50/50 to-white/95 dark:from-sky-950/40 dark:via-indigo-950/25 dark:to-slate-900/90 shadow-xl shadow-sky-500/5 space-y-6">
+          <div className="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-sky-400/20 dark:bg-sky-500/10 blur-2xl pointer-events-none" />
+          
+          <div className="flex items-center justify-between relative z-10">
             <h3 className="text-xl font-black text-slate-900 dark:text-white font-headline flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-sky-100 dark:bg-sky-950/80 text-sky-600 dark:text-sky-300 flex items-center justify-center border border-sky-200/60">
                 <CheckSquare className="w-5 h-5" />
               </div>
               <span>Assignments & Action Items</span>
             </h3>
-            <span className="text-xs font-black text-indigo-700 bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full border border-indigo-100 dark:border-indigo-900/50">
+            <span className="text-xs font-black text-sky-800 dark:text-sky-200 bg-sky-100 dark:bg-sky-950/80 px-3 py-1 rounded-full border border-sky-200/80 dark:border-sky-900/60 shadow-xs">
               {tasks.filter(t => t.completed).length} / {tasks.length} Completed
             </span>
           </div>
 
           {filteredTasks.length === 0 ? (
-            <div className="py-16 text-center text-slate-400 space-y-2">
+            <div className="py-16 text-center text-slate-400 space-y-2 relative z-10">
               <Sparkles className="w-10 h-10 text-indigo-600 mx-auto opacity-50" />
               <p className="font-bold text-base text-slate-800 dark:text-slate-200">No tasks found!</p>
             </div>
           ) : (
-              <div className="space-y-2">
+            <div className="space-y-2.5 relative z-10">
               {filteredTasks.map((t) => (
                 <div
                   key={t.id}
                   style={{ borderRightColor: getCardAccent(t.subject || t.priority), borderRightWidth: '5px' }}
-                  className="task-card group p-4 sm:p-5 rounded-3xl bg-white/72 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 transition-all border border-indigo-100/80 dark:border-slate-700 space-y-3"
+                  className="task-card group p-4 sm:p-5 rounded-3xl bg-white/85 dark:bg-slate-800/85 hover:bg-white dark:hover:bg-slate-800 transition-all border border-sky-200/60 dark:border-slate-700 shadow-xs space-y-3"
                 >
                   <div className="flex items-start gap-4">
                     <input
@@ -1218,6 +1220,7 @@ export const NotesAndTasks: React.FC = () => {
                     type="text"
                     value={taskSubject}
                     onChange={(e) => setTaskSubject(e.target.value)}
+                    placeholder="Optional (e.g. Mathematics)"
                     className="w-full bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl py-2.5 px-4 text-sm border border-slate-200 dark:border-slate-700 focus:border-indigo-600 focus:outline-none"
                   />
                 </div>

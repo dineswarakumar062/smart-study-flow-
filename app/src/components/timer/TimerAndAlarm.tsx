@@ -337,59 +337,61 @@ export const TimerAndAlarm: React.FC = () => {
       </div>
 
       {activePanel === 'alarms' ? (
-        /* ALARMS VIEW */
-        <section className="relative mx-auto max-w-2xl space-y-4 rounded-3xl border border-slate-200/80 bg-white p-5 pb-24 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-7 sm:pb-24">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300">
+        /* ALARMS VIEW (Vibrant Sky/Indigo Aurora Glass) */
+        <section className="relative mx-auto max-w-2xl space-y-4 rounded-3xl border border-sky-200/90 dark:border-sky-800/60 bg-gradient-to-br from-sky-50/95 via-indigo-50/50 to-white/95 dark:from-sky-950/40 dark:via-indigo-950/25 dark:to-slate-900/90 p-5 pb-24 shadow-xl shadow-sky-500/5 sm:p-7 sm:pb-24 overflow-hidden">
+          <div className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-sky-400/20 dark:bg-sky-500/10 blur-2xl pointer-events-none" />
+          
+          <div className="flex items-center gap-3 relative z-10">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 dark:bg-sky-950/80 text-sky-600 dark:text-sky-300 border border-sky-200/60">
               <AlarmClock className="h-5 w-5" />
             </div>
             <div>
               <h2 className="text-xl font-black text-slate-900 dark:text-white">Study Alarms</h2>
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Native alarms work in background.</p>
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Native alarms work in background on Android & PC.</p>
             </div>
           </div>
           
           {alarmFormOpen && (
-            <div className="grid grid-cols-1 gap-3 rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/70 sm:grid-cols-[1fr_auto_auto_auto] sm:items-end">
-              <label className="text-xs font-bold text-slate-500">
+            <div className="grid grid-cols-1 gap-3 rounded-2xl bg-white/85 dark:bg-slate-800/85 p-4 border border-sky-200/60 dark:border-slate-700 shadow-xs sm:grid-cols-[1fr_auto_auto_auto] sm:items-end relative z-10">
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400">
                 Alarm name
                 <input value={alarmLabel} onChange={event => setAlarmLabel(event.target.value)} className="glass-input mt-1" placeholder="Study reminder" />
               </label>
-              <label className="text-xs font-bold text-slate-500">
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400">
                 Time
                 <input type="time" value={alarmTime} onChange={event => setAlarmTime(event.target.value)} className="glass-input mt-1" />
               </label>
-              <label className="text-xs font-bold text-slate-500">
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400">
                 Repeat
                 <select value={alarmRepeat} onChange={event => setAlarmRepeat(event.target.value as 'once' | 'daily')} className="glass-input mt-1">
                   <option value="daily">Daily</option>
                   <option value="once">Once</option>
                 </select>
               </label>
-              <button type="button" onClick={saveAlarm} className="glass-primary-button inline-flex items-center justify-center gap-1 rounded-full px-4 py-2.5 text-xs">
+              <button type="button" onClick={saveAlarm} className="glass-primary-button inline-flex items-center justify-center gap-1 rounded-full px-4 py-2.5 text-xs font-black">
                 <Plus className="h-4 w-4" />{editingAlarmId ? 'Save' : 'Add'}
               </button>
             </div>
           )}
 
           {alarms.length === 0 ? (
-            <p className="py-8 text-center text-sm font-semibold text-slate-400">No alarms yet. Tap the bottom right + button to add a reminder.</p>
+            <p className="py-8 text-center text-sm font-semibold text-slate-400 relative z-10">No alarms yet. Tap the bottom right + button to add a reminder.</p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 relative z-10">
               {alarms.map(alarm => (
-                <div key={alarm.id} className="flex items-center justify-between gap-3 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-3 dark:border-slate-700 dark:bg-slate-800/70">
+                <div key={alarm.id} className="flex items-center justify-between gap-3 rounded-2xl border border-sky-200/60 bg-white/85 p-3.5 dark:border-slate-700 dark:bg-slate-800/85 shadow-xs">
                   <div className="flex min-w-0 items-center gap-3">
-                    <Bell className={`h-5 w-5 shrink-0 ${alarm.enabled ? 'text-indigo-600' : 'text-slate-400'}`} />
+                    <Bell className={`h-5 w-5 shrink-0 ${alarm.enabled ? 'text-sky-600' : 'text-slate-400'}`} />
                     <div className="min-w-0">
                       <p className="truncate text-sm font-black text-slate-900 dark:text-white">{alarm.label}</p>
                       <p className="text-xs font-semibold text-slate-500">{alarm.time} · {alarm.repeat === 'daily' ? 'Every day' : 'Once'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button type="button" aria-label={`${alarm.enabled ? 'Disable' : 'Enable'} ${alarm.label}`} onClick={() => toggleAlarm(alarm.id)} className={`rounded-full px-3 py-1.5 text-xs font-black ${alarm.enabled ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500 dark:bg-slate-700'}`}>
+                    <button type="button" aria-label={`${alarm.enabled ? 'Disable' : 'Enable'} ${alarm.label}`} onClick={() => toggleAlarm(alarm.id)} className={`rounded-full px-3 py-1.5 text-xs font-black ${alarm.enabled ? 'bg-[#0284c7] text-white' : 'bg-slate-200 text-slate-500 dark:bg-slate-700'}`}>
                       {alarm.enabled ? 'Enabled' : 'Off'}
                     </button>
-                    <button type="button" aria-label={`Edit ${alarm.label}`} onClick={() => openAlarmForm(alarm)} className="glass-icon-button h-8 w-8 p-1.5 text-indigo-600">
+                    <button type="button" aria-label={`Edit ${alarm.label}`} onClick={() => openAlarmForm(alarm)} className="glass-icon-button h-8 w-8 p-1.5 text-sky-600">
                       <Edit3 className="h-4 w-4" />
                     </button>
                     <button type="button" aria-label={`Delete ${alarm.label}`} onClick={() => deleteAlarm(alarm.id)} className="glass-icon-button h-8 w-8 p-1.5 text-rose-500">
@@ -407,11 +409,13 @@ export const TimerAndAlarm: React.FC = () => {
            ========================================================================= */
         <div className="space-y-4 sm:space-y-5">
           
-          {/* Main 3D Spherical Liquid Glass Card */}
-          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-3xl p-5 sm:p-7 border border-slate-200/80 dark:border-slate-800 shadow-2xl max-w-2xl mx-auto text-center space-y-3 sm:space-y-4 relative overflow-hidden">
+          {/* Main 3D Spherical Liquid Glass Card (Vibrant Cosmic Indigo Aurora) */}
+          <div className="relative overflow-hidden rounded-3xl p-5 sm:p-7 border border-indigo-200/90 dark:border-indigo-800/60 bg-gradient-to-br from-indigo-50/95 via-purple-50/50 to-white/95 dark:from-indigo-950/45 dark:via-purple-950/25 dark:to-slate-900/90 shadow-2xl shadow-indigo-500/10 max-w-2xl mx-auto text-center space-y-3 sm:space-y-4">
             
+            <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-gradient-to-br from-indigo-400/20 to-purple-500/20 dark:from-indigo-500/15 dark:to-purple-500/10 blur-3xl pointer-events-none" />
+
             {/* Header: Active Preset Name & Duration Info */}
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-2.5">
+            <div className="flex items-center justify-between border-b border-indigo-100/90 dark:border-slate-800/80 pb-2.5 relative z-10">
               <div className="flex items-center gap-2.5">
                 <span className={`text-xs font-black px-3.5 py-1.5 rounded-xl border ${getThemeBadgeStyle(activeTimer.colorTheme)}`}>
                   {activeTimer.name}
@@ -647,43 +651,46 @@ export const TimerAndAlarm: React.FC = () => {
           </div>
 
           {/* =========================================================================
-              DAILY FOCUS STATS & COMPLETED SESSIONS
+              DAILY FOCUS STATS & COMPLETED SESSIONS (Vibrant Aurora Cards)
               ========================================================================= */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
             
-            {/* Stat Card 1: Today's Focus Hours */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 flex items-center justify-center font-bold">
+            {/* Stat Card 1: Today's Focus Hours (Vibrant Sunset Amber Aurora) */}
+            <div className="relative overflow-hidden rounded-3xl p-6 border border-orange-200/90 dark:border-orange-800/60 bg-gradient-to-br from-orange-50/95 via-amber-50/50 to-white/95 dark:from-orange-950/40 dark:via-amber-950/25 dark:to-slate-900/90 shadow-xl shadow-orange-500/5 flex items-center gap-4">
+              <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-orange-400/20 dark:bg-orange-500/10 blur-xl pointer-events-none" />
+              <div className="w-12 h-12 rounded-2xl bg-orange-100 dark:bg-orange-950/80 text-orange-600 dark:text-orange-400 flex items-center justify-center font-bold border border-orange-200/60 relative z-10 shrink-0">
                 <Flame className="w-6 h-6 fill-current" />
               </div>
-              <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Focus Time</p>
+              <div className="relative z-10">
+                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Today's Focus Time</p>
                 <h4 className="text-2xl font-black text-slate-900 dark:text-white font-headline">
                   {focusHours > 0 ? `${focusHours}h ` : ''}{focusRemainderMins}m
                 </h4>
               </div>
             </div>
 
-            {/* Stat Card 2: Completed Sessions Count */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 flex items-center justify-center font-bold">
+            {/* Stat Card 2: Completed Sessions Count (Vibrant Indigo Aurora) */}
+            <div className="relative overflow-hidden rounded-3xl p-6 border border-indigo-200/90 dark:border-indigo-800/60 bg-gradient-to-br from-indigo-50/95 via-purple-50/50 to-white/95 dark:from-indigo-950/40 dark:via-purple-950/25 dark:to-slate-900/90 shadow-xl shadow-indigo-500/5 flex items-center gap-4">
+              <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-indigo-400/20 dark:bg-indigo-500/10 blur-xl pointer-events-none" />
+              <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-300 flex items-center justify-center font-bold border border-indigo-200/60 relative z-10 shrink-0">
                 <Award className="w-6 h-6" />
               </div>
-              <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Sessions Completed</p>
+              <div className="relative z-10">
+                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sessions Completed</p>
                 <h4 className="text-2xl font-black text-slate-900 dark:text-white font-headline">
                   {todaySessions.length} sessions
                 </h4>
               </div>
             </div>
 
-            {/* Stat Card 3: Total Recorded */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center font-bold">
+            {/* Stat Card 3: Total Recorded (Vibrant Emerald Aurora) */}
+            <div className="relative overflow-hidden rounded-3xl p-6 border border-emerald-200/90 dark:border-emerald-800/60 bg-gradient-to-br from-emerald-50/95 via-teal-50/50 to-white/95 dark:from-emerald-950/40 dark:via-teal-950/25 dark:to-slate-900/90 shadow-xl shadow-emerald-500/5 flex items-center gap-4">
+              <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-emerald-400/20 dark:bg-emerald-500/10 blur-xl pointer-events-none" />
+              <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-300 flex items-center justify-center font-bold border border-emerald-200/60 relative z-10 shrink-0">
                 <TrendingUp className="w-6 h-6" />
               </div>
-              <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Lifetime Sessions</p>
+              <div className="relative z-10">
+                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Lifetime Sessions</p>
                 <h4 className="text-2xl font-black text-slate-900 dark:text-white font-headline">
                   {sessions.length} total
                 </h4>
@@ -692,26 +699,30 @@ export const TimerAndAlarm: React.FC = () => {
 
           </div>
 
-          {/* Completed Focus Sessions List */}
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm max-w-5xl mx-auto space-y-4">
-            <div className="flex items-center justify-between">
+          {/* Completed Focus Sessions List (Vibrant Orchid/Purple Aurora) */}
+          <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-purple-200/90 dark:border-purple-800/60 bg-gradient-to-br from-purple-50/95 via-indigo-50/50 to-white/95 dark:from-purple-950/40 dark:via-indigo-950/25 dark:to-slate-900/90 shadow-xl shadow-purple-500/5 max-w-5xl mx-auto space-y-4">
+            <div className="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-purple-400/20 dark:bg-purple-500/10 blur-2xl pointer-events-none" />
+            
+            <div className="flex items-center justify-between relative z-10">
               <h3 className="text-lg font-black text-slate-900 dark:text-white font-headline flex items-center gap-2">
-                <Award className="w-5 h-5 text-amber-500" />
+                <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 flex items-center justify-center border border-purple-200/60">
+                  <Award className="w-4 h-4 text-amber-500" />
+                </div>
                 <span>Recent Focus Sessions History</span>
               </h3>
             </div>
 
             {sessions.length === 0 ? (
-              <p className="text-sm text-slate-400 py-6 text-center">No focus sessions recorded yet today. Hit play above to begin!</p>
+              <p className="text-sm text-slate-500 font-bold py-6 text-center relative z-10">No focus sessions recorded yet today. Hit play above to begin!</p>
             ) : (
-              <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+              <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1 relative z-10">
                 {sessions.slice(0, 10).map((s) => (
                   <div
                     key={s.id}
-                    className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700"
+                    className="flex items-center justify-between p-4 rounded-2xl bg-white/85 dark:bg-slate-800/85 border border-purple-200/60 dark:border-slate-700 shadow-xs"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 flex items-center justify-center font-bold">
+                      <div className="w-9 h-9 rounded-xl bg-orange-100 dark:bg-orange-950/70 text-orange-600 flex items-center justify-center font-bold border border-orange-200/60">
                         <Sparkles className="w-4 h-4" />
                       </div>
                       <div>
