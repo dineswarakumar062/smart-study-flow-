@@ -114,6 +114,17 @@ button:hover::after { opacity: 1; transform: translateX(45%); }
 .dark .task-card { background: linear-gradient(145deg, rgba(30,41,59,.86), rgba(15,23,42,.76)); }
 .dark .task-subtasks { background: rgba(30,41,59,.62); }
 .dark .task-add-subtask { background: rgba(49,46,129,.38); color: #c7d2fe; }
+.note-editor-content:empty::before { content: attr(data-placeholder); color: rgb(148 163 184); pointer-events: none; }
+.note-editor-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.note-editor-content td, .note-editor-content th { border: 1px solid rgba(99,102,241,.28); padding: .6rem .75rem; min-width: 5rem; }
+.note-editor-content th { background: rgba(224,231,255,.65); font-weight: 800; }
+.note-editor-content ul, .note-editor-content ol { padding-left: 1.5rem; margin: .75rem 0; }
+.note-editor-content ul { list-style: disc; }
+.note-editor-content ol { list-style: decimal; }
+.note-editor-content h2 { font-size: 1.35rem; font-weight: 850; margin: 1rem 0 .5rem; }
+.note-editor-content p { min-height: 1.75rem; }
+.dark .note-editor-content td, .dark .note-editor-content th { border-color: rgba(129,140,248,.35); }
+.dark .note-editor-content th { background: rgba(49,46,129,.38); }
 
 @media (max-width: 640px) {
   .dashboard-page > .hero-banner-gradient { padding: 1.25rem; border-radius: 1.35rem; }

@@ -4,6 +4,17 @@ import type { TaskPriority, TaskItem, NoteItem } from '../../types';
 import { 
   FileText, 
   CheckSquare, 
+  Bold,
+  Italic,
+  Underline,
+  AlignLeft,
+  AlignCenter,
+  List,
+  ListOrdered,
+  Table2,
+  CheckSquare2,
+  Undo2,
+  Redo2,
   Plus, 
   Pin, 
   Trash2, 
@@ -161,6 +172,30 @@ export const NotesAndTasks: React.FC = () => {
     addSubtask(taskId, subtaskTitle);
     setSubtaskTitle('');
     setAddingSubtaskFor(null);
+  };
+
+  const editorTools: Array<{ command: string; icon: React.ReactNode; label: string }> = [
+    { command: 'bold', icon: <Bold className="h-4 w-4" />, label: 'Bold' },
+    { command: 'italic', icon: <Italic className="h-4 w-4" />, label: 'Italic' },
+    { command: 'underline', icon: <Underline className="h-4 w-4" />, label: 'Underline' },
+    { command: 'formatBlock', icon: <span className="text-xs font-black">H2</span>, label: 'Heading' },
+    { command: 'justifyLeft', icon: <AlignLeft className="h-4 w-4" />, label: 'Align left' },
+    { command: 'justifyCenter', icon: <AlignCenter className="h-4 w-4" />, label: 'Align center' },
+    { command: 'insertUnorderedList', icon: <List className="h-4 w-4" />, label: 'Bulleted list' },
+    { command: 'insertOrderedList', icon: <ListOrdered className="h-4 w-4" />, label: 'Numbered list' },
+    { command: 'undo', icon: <Undo2 className="h-4 w-4" />, label: 'Undo' },
+    { command: 'redo', icon: <Redo2 className="h-4 w-4" />, label: 'Redo' },
+  ];
+
+  const runEditorCommand = (command: string, value?: string) => {
+    document.execCommand(command, false, value);
+    const editor = document.querySelector('[data-note-editor="active"]') as HTMLElement | null;
+    if (editor && fullPageNote) {
+      const content = editor.innerHTML;
+      setFullPageNote({ ...fullPageNote, content });
+      updateNote(fullPageNote.id, { content });
+      editor.focus();
+    }
   };
 
   return (
@@ -452,24 +487,22 @@ export const NotesAndTasks: React.FC = () => {
 
       {/* FULL PAGE NOTE READER & EDITOR OVERLAY MODAL */}
       {fullPageNote && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-8">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-5xl w-full h-[90vh] border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-md z-50 flex items-center justify-center p-0 sm:p-4">
+          <div className="bg-white dark:bg-slate-900 w-full h-full sm:h-[94vh] max-w-6xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden">
             
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+            <div className="flex items-center justify-between px-4 py-3 sm:px-7 sm:py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
               <div className="flex items-center gap-3">
                 <span className="text-xs font-black px-3 py-1 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100">
                   {fullPageNote.subject}
                 </span>
-                <h3 className="text-xl font-black text-slate-900 dark:text-white font-headline line-clamp-1">
-                  {fullPageNote.title}
-                </h3>
+                <span className="hidden text-xs font-bold text-slate-400 sm:inline">Full-screen note</span>
               </div>
 
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => togglePinNote(fullPageNote.id)}
-                  className={`p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 ${fullPageNote.isPinned ? 'text-amber-500' : 'text-slate-400'}`}
+                  className={`glass-icon-button ${fullPageNote.isPinned ? 'text-amber-500' : 'text-slate-400'}`}
                   title="Toggle Pin"
                 >
                   <Pin className="w-5 h-5 fill-current" />
@@ -477,7 +510,8 @@ export const NotesAndTasks: React.FC = () => {
 
                 <button
                   onClick={() => setFullPageNote(null)}
-                  className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  aria-label="Close note editor"
+                  className="glass-icon-button text-slate-400 hover:text-slate-700 dark:hover:text-white"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -485,7 +519,7 @@ export const NotesAndTasks: React.FC = () => {
             </div>
 
             {/* Note Editor Body */}
-            <div className="flex-1 p-6 sm:p-8 overflow-y-auto space-y-4">
+            <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-12 sm:py-8">
               <input
                 type="text"
                 value={fullPageNote.title}
@@ -494,36 +528,48 @@ export const NotesAndTasks: React.FC = () => {
                   setFullPageNote(updated);
                   updateNote(fullPageNote.id, { title: e.target.value });
                 }}
-                className="text-3xl font-black text-slate-900 dark:text-white font-headline bg-transparent border-none focus:outline-none w-full"
+                className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white font-headline bg-transparent border-none focus:outline-none w-full"
                 placeholder="Note Title..."
               />
 
-              <div className="flex items-center gap-2 pb-4 border-b border-slate-200 dark:border-slate-800">
+              <div className="mt-2 flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3 dark:border-slate-800">
                 {fullPageNote.tags.map(t => (
                   <span key={t} className="text-xs text-indigo-600 font-bold flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md">
                     <Tag className="w-3 h-3" />
                     #{t}
                   </span>
                 ))}
-                <span className="text-xs text-slate-400 ml-auto">
+                <span className="text-xs text-slate-400 sm:ml-auto">
                   Updated {new Date(fullPageNote.updatedAt).toLocaleString()}
                 </span>
               </div>
 
-              <textarea
-                value={fullPageNote.content}
-                onChange={(e) => {
-                  const updated = { ...fullPageNote, content: e.target.value };
-                  setFullPageNote(updated);
-                  updateNote(fullPageNote.id, { content: e.target.value });
+              <div className="sticky top-0 z-10 -mx-5 mt-4 flex flex-wrap gap-1 border-y border-slate-200 bg-white/95 px-4 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95 sm:-mx-12 sm:px-8">
+                {editorTools.map(({ command, icon, label }) => (
+                  <button key={command} type="button" onMouseDown={event => event.preventDefault()} onClick={() => runEditorCommand(command, command === 'formatBlock' ? 'h2' : undefined)} aria-label={label} title={label} className="glass-icon-button h-9 w-9 p-2 text-slate-600 dark:text-slate-300">{icon}</button>
+                ))}
+                <button type="button" onClick={() => runEditorCommand('insertHTML', '<table><tbody><tr><td>Cell</td><td>Cell</td></tr><tr><td>Cell</td><td>Cell</td></tr></tbody></table><p><br></p>')} aria-label="Insert table" title="Insert table" className="glass-icon-button h-9 w-9 p-2 text-slate-600 dark:text-slate-300"><Table2 className="h-4 w-4" /></button>
+                <button type="button" onClick={() => runEditorCommand('insertHTML', '<ul class="note-checklist"><li>☐ Checklist item</li></ul><p><br></p>')} aria-label="Insert checklist" title="Insert checklist" className="glass-icon-button h-9 w-9 p-2 text-slate-600 dark:text-slate-300"><CheckSquare2 className="h-4 w-4" /></button>
+              </div>
+
+              <div
+                key={`${fullPageNote.id}-${fullPageNote.updatedAt}`}
+                data-note-editor="active"
+                contentEditable
+                suppressContentEditableWarning
+                onInput={event => {
+                  const content = event.currentTarget.innerHTML;
+                  setFullPageNote({ ...fullPageNote, content });
+                  updateNote(fullPageNote.id, { content });
                 }}
-                className="w-full min-h-[500px] bg-transparent text-slate-800 dark:text-slate-200 text-base leading-relaxed border-none focus:outline-none resize-none font-mono"
-                placeholder="Type your markdown notes here..."
+                dangerouslySetInnerHTML={{ __html: fullPageNote.content || '<p><br></p>' }}
+                className="note-editor-content min-h-[55vh] w-full bg-transparent pt-5 text-base leading-8 text-slate-800 outline-none dark:text-slate-200"
+                data-placeholder="Start writing your note..."
               />
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end">
+            <div className="p-3 sm:p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end">
               <button
                 onClick={() => setFullPageNote(null)}
                 className="px-6 py-2.5 rounded-2xl bg-[#4338ca] text-white font-black text-sm shadow-md hover:bg-[#3730a3]"

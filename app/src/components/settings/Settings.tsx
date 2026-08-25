@@ -13,9 +13,11 @@ import {
   Smartphone, 
   Laptop,
   CheckCircle2,
-  Radio,
   Bell,
-  BellOff
+  BellOff,
+  Cloud,
+  LogIn,
+  LogOut
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { getNotificationPermission, requestNotificationPermission, type NotificationPermission } from '../../services/notifications';
@@ -30,10 +32,19 @@ export const Settings: React.FC = () => {
     lastSyncTime,
     exportData,
     importData
+    , firebaseConfigured,
+    firebaseUser,
+    signIn,
+    createAccount,
+    signOut
   } = useApp();
 
   const [importStatus, setImportStatus] = useState<string | null>(null);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('prompt');
+  const [syncEmail, setSyncEmail] = useState('');
+  const [syncPassword, setSyncPassword] = useState('');
+  const [syncError, setSyncError] = useState<string | null>(null);
+  const [syncBusy, setSyncBusy] = useState(false);
 
   useEffect(() => {
     void getNotificationPermission().then(setNotificationPermission);
@@ -43,6 +54,20 @@ export const Settings: React.FC = () => {
     const granted = await requestNotificationPermission();
     setNotificationPermission(granted ? 'granted' : await getNotificationPermission());
     updateSettings({ notificationsEnabled: granted });
+  };
+
+  const handleCloudAuth = async (create: boolean) => {
+    setSyncBusy(true);
+    setSyncError(null);
+    try {
+      if (create) await createAccount(syncEmail, syncPassword);
+      else await signIn(syncEmail, syncPassword);
+      setSyncPassword('');
+    } catch (error) {
+      setSyncError(error instanceof Error ? error.message : 'Unable to connect to Firebase.');
+    } finally {
+      setSyncBusy(false);
+    }
   };
 
   const handleExport = () => {
@@ -250,21 +275,45 @@ export const Settings: React.FC = () => {
         )}
       </div>
 
-      {/* 3. Same-browser synchronization & backup */}
+      {/* 3. Cloud synchronization & backup */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-md space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-black text-slate-900 dark:text-white font-headline flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 flex items-center justify-center">
-              <Radio className="w-5 h-5" />
+              <Cloud className="w-5 h-5" />
             </div>
-            <span>Same-browser Tab Sync & Backup</span>
+            <span>Cloud Sync & Backup</span>
           </h3>
 
-          <span className="flex items-center gap-1.5 text-xs font-black px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-            Tab Sync Active
+          <span className={`flex items-center gap-1.5 text-xs font-black px-3 py-1 rounded-full border ${firebaseUser ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700'}`}>
+            <span className={`w-2 h-2 rounded-full ${firebaseUser ? 'bg-emerald-500 animate-ping' : 'bg-slate-400'}`}></span>
+            {firebaseUser ? 'Live sync active' : 'Not connected'}
           </span>
         </div>
+
+        {!firebaseConfigured ? (
+          <p className="rounded-2xl bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
+            Add the Firebase web configuration to the app environment before enabling cloud sync.
+          </p>
+        ) : firebaseUser ? (
+          <div className="flex items-center justify-between gap-3 rounded-2xl bg-indigo-50/70 p-4 dark:bg-indigo-950/30">
+            <div className="min-w-0"><span className="block text-xs font-bold text-slate-500">Signed in as</span><span className="block truncate text-sm font-black text-slate-900 dark:text-white">{firebaseUser.email}</span></div>
+            <button type="button" onClick={() => void signOut()} className="glass-secondary-button inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-xs"><LogOut className="h-4 w-4" />Sign out</button>
+          </div>
+        ) : (
+          <div className="space-y-3 rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/70">
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Use the same account on Android and PC. Changes will sync automatically when either device reconnects.</p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <input value={syncEmail} onChange={event => setSyncEmail(event.target.value)} type="email" placeholder="Email" className="glass-input" />
+              <input value={syncPassword} onChange={event => setSyncPassword(event.target.value)} type="password" placeholder="Password (6+ characters)" className="glass-input" />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" disabled={syncBusy || !syncEmail || syncPassword.length < 6} onClick={() => void handleCloudAuth(false)} className="glass-primary-button inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs"><LogIn className="h-4 w-4" />Sign in</button>
+              <button type="button" disabled={syncBusy || !syncEmail || syncPassword.length < 6} onClick={() => void handleCloudAuth(true)} className="glass-secondary-button rounded-full px-4 py-2 text-xs">Create account</button>
+            </div>
+            {syncError && <p role="alert" className="text-xs font-bold text-rose-600">{syncError}</p>}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700">
           <div className="flex items-center gap-3">

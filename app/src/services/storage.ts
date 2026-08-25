@@ -9,6 +9,8 @@ const STORAGE_KEYS = {
   SETTINGS: 'studyflow_settings',
 };
 
+const localChangeListeners = new Set<() => void>();
+
 export const defaultProfile: StudentProfile = {
   name: 'Alex Vance',
   major: 'Computer Science',
@@ -278,14 +280,17 @@ export const storage = {
     localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
     notifySync();
   },
+  getAllData: () => ({
+    profile: storage.getProfile(),
+    tasks: storage.getTasks(),
+    notes: storage.getNotes(),
+    schedule: storage.getSchedule(),
+    sessions: storage.getSessions(),
+    settings: storage.getSettings(),
+  }),
   exportAllData: () => {
     return JSON.stringify({
-      profile: storage.getProfile(),
-      tasks: storage.getTasks(),
-      notes: storage.getNotes(),
-      schedule: storage.getSchedule(),
-      sessions: storage.getSessions(),
-      settings: storage.getSettings(),
+      ...storage.getAllData(),
       exportTimestamp: new Date().toISOString(),
     }, null, 2);
   },
@@ -318,12 +323,18 @@ export const storage = {
   }
 };
 
+export const subscribeToLocalChanges = (listener: () => void) => {
+  localChangeListeners.add(listener);
+  return () => localChangeListeners.delete(listener);
+};
+
 // Cross-tab real-time broadcast channel
 const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in window 
   ? new BroadcastChannel('studyflow_sync_channel')
   : null;
 
 function notifySync() {
+  localChangeListeners.forEach(listener => listener());
   if (syncChannel) {
     syncChannel.postMessage({ type: 'SYNC_UPDATE', timestamp: Date.now() });
   }

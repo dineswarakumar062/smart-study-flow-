@@ -11,6 +11,15 @@ import type {
   ThemePreset
 } from '../types';
 import { storage, subscribeToSync } from '../services/storage';
+import {
+  firebaseConfigured,
+  subscribeToFirebaseAuth,
+  startFirebaseRealtimeSync,
+  signInToFirebase,
+  createFirebaseAccount,
+  signOutOfFirebase,
+  type FirebaseSyncUser,
+} from '../services/firebaseSync';
 
 interface AppContextType {
   activeTab: ActiveTab;
@@ -44,6 +53,11 @@ interface AppContextType {
   triggerSync: () => void;
   exportData: () => string;
   importData: (json: string) => boolean;
+  firebaseConfigured: boolean;
+  firebaseUser: FirebaseSyncUser | null;
+  signIn: (email: string, password: string) => Promise<void>;
+  createAccount: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
   mobileMenuOpen: boolean;
   setMobileMenuOpen: (open: boolean) => void;
 }
@@ -63,6 +77,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [lastSyncTime, setLastSyncTime] = useState<string>(new Date().toLocaleTimeString());
   const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'offline'>('synced');
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseSyncUser | null>(null);
 
   // Reload state from storage
   const reloadAllFromStorage = () => {
@@ -84,6 +99,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => subscribeToFirebaseAuth(setFirebaseUser), []);
 
   // Handle HTML document Theme classes
   useEffect(() => {
@@ -275,6 +292,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return ok;
   };
 
+  useEffect(() => startFirebaseRealtimeSync((remoteData) => {
+    if (storage.importAllData(remoteData)) reloadAllFromStorage();
+  }, setSyncStatus), []);
+
   return (
     <AppContext.Provider value={{
       activeTab,
@@ -308,6 +329,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       triggerSync,
       exportData,
       importData,
+      firebaseConfigured,
+      firebaseUser,
+      signIn: async (email, password) => { await signInToFirebase(email, password); },
+      createAccount: async (email, password) => { await createFirebaseAccount(email, password); },
+      signOut: signOutOfFirebase,
       mobileMenuOpen,
       setMobileMenuOpen,
     }}>
