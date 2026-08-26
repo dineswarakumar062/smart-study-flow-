@@ -20,6 +20,9 @@ import {
   signInToFirebase,
   createFirebaseAccount,
   signOutOfFirebase,
+  uploadDeviceDataToCloud,
+  downloadCloudDataToDevice,
+  safeMergeCloudAndDevice,
   type FirebaseSyncUser,
 } from '../services/firebaseSync';
 
@@ -58,7 +61,12 @@ interface AppContextType {
   setThemePreset: (preset: ThemePreset) => void;
   lastSyncTime: string;
   syncStatus: 'synced' | 'syncing' | 'offline';
+  lastCloudUpload: string | null;
+  lastCloudDownload: string | null;
   triggerSync: () => void;
+  uploadToCloud: () => Promise<{ success: boolean; message: string }>;
+  downloadFromCloud: () => Promise<{ success: boolean; message: string }>;
+  safeMergeSync: () => Promise<{ success: boolean; message: string }>;
   exportData: () => string;
   importData: (json: string) => boolean;
   firebaseConfigured: boolean;
@@ -86,6 +94,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [lastSyncTime, setLastSyncTime] = useState<string>(new Date().toLocaleTimeString());
   const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'offline'>('synced');
+  const [lastCloudUpload, setLastCloudUpload] = useState<string | null>(storage.getLastCloudUpload());
+  const [lastCloudDownload, setLastCloudDownload] = useState<string | null>(storage.getLastCloudDownload());
   const [firebaseUser, setFirebaseUser] = useState<FirebaseSyncUser | null>(null);
 
   // Reload state from storage
@@ -98,8 +108,49 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSessions(storage.getSessions());
     setAlarms(storage.getAlarms());
     setSettings(storage.getSettings());
+    setLastCloudUpload(storage.getLastCloudUpload());
+    setLastCloudDownload(storage.getLastCloudDownload());
     setLastSyncTime(new Date().toLocaleTimeString());
     setTimeout(() => setSyncStatus('synced'), 300);
+  };
+
+  const uploadToCloud = async () => {
+    setSyncStatus('syncing');
+    const result = await uploadDeviceDataToCloud();
+    if (result.success) {
+      setLastCloudUpload(storage.getLastCloudUpload());
+      setSyncStatus('synced');
+    } else {
+      setSyncStatus('offline');
+    }
+    return result;
+  };
+
+  const downloadFromCloud = async () => {
+    setSyncStatus('syncing');
+    const result = await downloadCloudDataToDevice();
+    if (result.success) {
+      reloadAllFromStorage();
+      setLastCloudDownload(storage.getLastCloudDownload());
+      setSyncStatus('synced');
+    } else {
+      setSyncStatus('offline');
+    }
+    return result;
+  };
+
+  const safeMergeSync = async () => {
+    setSyncStatus('syncing');
+    const result = await safeMergeCloudAndDevice();
+    if (result.success) {
+      reloadAllFromStorage();
+      setLastCloudUpload(storage.getLastCloudUpload());
+      setLastCloudDownload(storage.getLastCloudDownload());
+      setSyncStatus('synced');
+    } else {
+      setSyncStatus('offline');
+    }
+    return result;
   };
 
   // Subscribe to real-time sync updates
@@ -383,7 +434,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setThemePreset,
       lastSyncTime,
       syncStatus,
+      lastCloudUpload,
+      lastCloudDownload,
       triggerSync,
+      uploadToCloud,
+      downloadFromCloud,
+      safeMergeSync,
       exportData,
       importData,
       firebaseConfigured,

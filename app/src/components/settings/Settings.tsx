@@ -12,6 +12,10 @@ import {
   CheckCircle2,
   AlertCircle,
   Cloud,
+  CloudUpload,
+  CloudDownload,
+  GitMerge,
+  ShieldCheck,
   LogIn,
   LogOut,
   Bell,
@@ -35,6 +39,11 @@ export const Settings: React.FC = () => {
     syncStatus, 
     triggerSync, 
     lastSyncTime,
+    lastCloudUpload,
+    lastCloudDownload,
+    uploadToCloud,
+    downloadFromCloud,
+    safeMergeSync,
     exportData,
     importData,
     firebaseConfigured,
@@ -51,6 +60,7 @@ export const Settings: React.FC = () => {
   const [syncPassword, setSyncPassword] = useState('');
   const [syncError, setSyncError] = useState<string | null>(null);
   const [syncBusy, setSyncBusy] = useState(false);
+  const [cloudActionMsg, setCloudActionMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     void getNotificationPermission().then(setNotificationPermission);
@@ -92,6 +102,34 @@ export const Settings: React.FC = () => {
     } finally {
       setSyncBusy(false);
     }
+  };
+
+  const handleUploadToCloud = async () => {
+    setSyncBusy(true);
+    setCloudActionMsg(null);
+    const res = await uploadToCloud();
+    setSyncBusy(false);
+    setCloudActionMsg({ type: res.success ? 'success' : 'error', text: res.message });
+    if (res.success) confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+  };
+
+  const handleDownloadFromCloud = async () => {
+    if (!window.confirm('Download latest cloud backup to this device? This will update your local notes, tasks, and classes with the cloud version.')) return;
+    setSyncBusy(true);
+    setCloudActionMsg(null);
+    const res = await downloadFromCloud();
+    setSyncBusy(false);
+    setCloudActionMsg({ type: res.success ? 'success' : 'error', text: res.message });
+    if (res.success) confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+  };
+
+  const handleSafeMerge = async () => {
+    setSyncBusy(true);
+    setCloudActionMsg(null);
+    const res = await safeMergeSync();
+    setSyncBusy(false);
+    setCloudActionMsg({ type: res.success ? 'success' : 'error', text: res.message });
+    if (res.success) confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
   };
 
   const handleExport = () => {
@@ -298,27 +336,132 @@ export const Settings: React.FC = () => {
 
           <span className={`flex items-center gap-1.5 text-xs font-black px-3.5 py-1 rounded-full border ${firebaseUser ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'}`}>
             <span className={`w-2 h-2 rounded-full ${firebaseUser ? 'bg-emerald-500 animate-ping' : 'bg-slate-400'}`}></span>
-            {firebaseUser ? 'Live sync active' : 'Not connected'}
+            {firebaseUser ? 'Connected to Cloud' : 'Not connected'}
           </span>
         </div>
+
+        {/* Action Status Feedback Message */}
+        {cloudActionMsg && (
+          <div
+            className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 relative z-10 animate-fade-in ${
+              cloudActionMsg.type === 'success'
+                ? 'bg-emerald-100/90 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-200 border-emerald-300 dark:border-emerald-700'
+                : 'bg-rose-100/90 dark:bg-rose-950/80 text-rose-900 dark:text-rose-200 border-rose-300 dark:border-rose-700'
+            }`}
+          >
+            {cloudActionMsg.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+            )}
+            <span>{cloudActionMsg.text}</span>
+          </div>
+        )}
 
         {!firebaseConfigured ? (
           <p className="rounded-2xl bg-amber-50/90 dark:bg-amber-950/40 px-4 py-3 text-xs font-semibold text-amber-800 dark:text-amber-200 border border-amber-200/60 dark:border-amber-800/50 relative z-10">
             Add the Firebase web configuration to the app environment before enabling cloud sync.
           </p>
         ) : firebaseUser ? (
-          <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/80 dark:bg-emerald-950/40 p-4 border border-emerald-200/80 dark:border-emerald-800/60 shadow-xs relative z-10">
-            <div className="min-w-0">
-              <span className="block text-xs font-bold text-slate-500 dark:text-slate-400">Signed in as</span>
-              <span className="block truncate text-sm font-black text-slate-900 dark:text-white">{firebaseUser.email}</span>
+          <div className="space-y-4 relative z-10">
+            {/* Account Info Header */}
+            <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 p-4 border border-emerald-200/80 dark:border-slate-700 shadow-xs">
+              <div className="min-w-0">
+                <span className="block text-xs font-bold text-slate-500 dark:text-slate-400">Signed in as</span>
+                <span className="block truncate text-sm font-black text-slate-900 dark:text-white">{firebaseUser.email}</span>
+              </div>
+              <button type="button" onClick={() => void signOut()} className="glass-secondary-button inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-xs font-black">
+                <LogOut className="h-4 w-4" />Sign out
+              </button>
             </div>
-            <button type="button" onClick={() => void signOut()} className="glass-secondary-button inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-xs font-black">
-              <LogOut className="h-4 w-4" />Sign out
-            </button>
+
+            {/* THE 2 MASTER ACTION CARDS: UPLOAD VS DOWNLOAD */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              
+              {/* Option 1: Upload from this Device */}
+              <div className="p-5 rounded-3xl bg-white/90 dark:bg-slate-800/90 border border-indigo-200/80 dark:border-slate-700 shadow-sm flex flex-col justify-between space-y-4 hover:border-indigo-400 transition-all">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300 font-black text-sm">
+                    <CloudUpload className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    <span>Upload to Cloud</span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                    Pushes this device's notes, tasks, & classes up to the cloud as master backup.
+                  </p>
+                  <span className="inline-block text-[11px] font-bold text-slate-400">
+                    Last uploaded: {lastCloudUpload || 'Not uploaded yet'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={syncBusy}
+                  onClick={handleUploadToCloud}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-[#4338ca] hover:bg-[#3730a3] active:scale-95 text-white font-black text-xs shadow-md shadow-indigo-600/20 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  <CloudUpload className="w-4 h-4" />
+                  <span>{syncBusy ? 'Uploading...' : 'Upload Device Data'}</span>
+                </button>
+              </div>
+
+              {/* Option 2: Download from Cloud */}
+              <div className="p-5 rounded-3xl bg-white/90 dark:bg-slate-800/90 border border-sky-200/80 dark:border-slate-700 shadow-sm flex flex-col justify-between space-y-4 hover:border-sky-400 transition-all">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2 text-sky-700 dark:text-sky-300 font-black text-sm">
+                    <CloudDownload className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                    <span>Download from Cloud</span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                    Loads the latest cloud backup onto this device (useful when opening a new phone or PC).
+                  </p>
+                  <span className="inline-block text-[11px] font-bold text-slate-400">
+                    Last downloaded: {lastCloudDownload || 'Not downloaded yet'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={syncBusy}
+                  onClick={handleDownloadFromCloud}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-[#0284c7] hover:bg-[#0369a1] active:scale-95 text-white font-black text-xs shadow-md shadow-sky-600/20 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  <CloudDownload className="w-4 h-4" />
+                  <span>{syncBusy ? 'Downloading...' : 'Download Cloud Data'}</span>
+                </button>
+              </div>
+
+            </div>
+
+            {/* Smart 2-Way Merge (Safe Sync) */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-100/90 via-teal-100/70 to-emerald-100/90 dark:from-emerald-950/60 dark:via-teal-950/40 dark:to-emerald-950/60 border border-emerald-300 dark:border-emerald-700 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-emerald-950 dark:text-emerald-200">
+                    Safe 2-Way Merge (Zero Data Loss)
+                  </h4>
+                  <p className="text-[11px] text-emerald-800/80 dark:text-emerald-300/80 font-medium">
+                    Combines your phone notes created offline with the cloud so nothing is ever erased.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                disabled={syncBusy}
+                onClick={handleSafeMerge}
+                className="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black text-xs shadow-sm transition-all cursor-pointer disabled:opacity-50"
+              >
+                <GitMerge className="w-3.5 h-3.5" />
+                <span>Smart Merge Both</span>
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 p-4 border border-emerald-200/60 dark:border-slate-700 shadow-xs relative z-10">
-            <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">Use the same account on Android and PC. Changes will sync automatically when either device reconnects.</p>
+            <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">Sign in with the same email on Android and PC to back up and sync your notes and tasks across devices.</p>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label className="text-xs font-bold text-slate-500 dark:text-slate-400">
                 Email
@@ -352,7 +495,7 @@ export const Settings: React.FC = () => {
             className="glass-secondary-button inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs disabled:opacity-50 font-black"
           >
             <RefreshCw className={`h-4 w-4 ${syncStatus === 'syncing' ? 'animate-spin text-emerald-600' : ''}`} />
-            <span>{syncStatus === 'syncing' ? 'Syncing...' : 'Sync now'}</span>
+            <span>{syncStatus === 'syncing' ? 'Syncing...' : 'Quick Sync'}</span>
           </button>
         </div>
       </div>

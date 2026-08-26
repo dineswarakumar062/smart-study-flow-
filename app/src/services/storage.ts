@@ -372,6 +372,108 @@ export const storage = {
       exportTimestamp: new Date().toISOString(),
     }, null, 2);
   },
+  getLastCloudUpload: (): string | null => localStorage.getItem('study_flow_last_cloud_upload'),
+  setLastCloudUpload: (time: string) => localStorage.setItem('study_flow_last_cloud_upload', time),
+  getLastCloudDownload: (): string | null => localStorage.getItem('study_flow_last_cloud_download'),
+  setLastCloudDownload: (time: string) => localStorage.setItem('study_flow_last_cloud_download', time),
+  mergeAllData: (remote: any): boolean => {
+    if (!remote || !isRecord(remote)) return false;
+    try {
+      // 1. Merge Tasks (Deduplicate by ID, keep all tasks, merge completion)
+      const localTasks = storage.getTasks();
+      const remoteTasks = (remote.tasks && Array.isArray(remote.tasks) ? remote.tasks : []) as TaskItem[];
+      const taskMap = new Map<string, TaskItem>();
+      localTasks.forEach(t => taskMap.set(t.id, t));
+      remoteTasks.forEach(rt => {
+        if (!taskMap.has(rt.id)) {
+          taskMap.set(rt.id, rt);
+        } else {
+          const local = taskMap.get(rt.id)!;
+          taskMap.set(rt.id, {
+            ...local,
+            ...rt,
+            completed: local.completed || rt.completed,
+            subtasks: Array.from(
+              new Map([
+                ...(local.subtasks || []).map(s => [s.id, s] as const),
+                ...(rt.subtasks || []).map(s => [s.id, s] as const),
+              ]).values()
+            ),
+          });
+        }
+      });
+      storage.saveTasks(Array.from(taskMap.values()));
+
+      // 2. Merge Notes (Deduplicate by ID, keep newer updatedAt)
+      const localNotes = storage.getNotes();
+      const remoteNotes = (remote.notes && Array.isArray(remote.notes) ? remote.notes : []) as NoteItem[];
+      const noteMap = new Map<string, NoteItem>();
+      localNotes.forEach(n => noteMap.set(n.id, n));
+      remoteNotes.forEach(rn => {
+        if (!noteMap.has(rn.id)) {
+          noteMap.set(rn.id, rn);
+        } else {
+          const local = noteMap.get(rn.id)!;
+          const localTime = new Date(local.updatedAt || local.createdAt || 0).getTime();
+          const remoteTime = new Date(rn.updatedAt || rn.createdAt || 0).getTime();
+          if (remoteTime > localTime) {
+            noteMap.set(rn.id, rn);
+          }
+        }
+      });
+      storage.saveNotes(Array.from(noteMap.values()));
+
+      // 3. Merge Schedule (Deduplicate by ID or dayOfWeek+startTime+subjectName)
+      const localSchedule = storage.getSchedule();
+      const remoteSchedule = (remote.schedule && Array.isArray(remote.schedule) ? remote.schedule : []) as ClassSchedule[];
+      const schedMap = new Map<string, ClassSchedule>();
+      localSchedule.forEach(s => schedMap.set(s.id, s));
+      remoteSchedule.forEach(rs => {
+        const isDuplicate = Array.from(schedMap.values()).some(
+          s => s.dayOfWeek === rs.dayOfWeek && s.startTime === rs.startTime && s.subjectName.toLowerCase() === rs.subjectName.toLowerCase()
+        );
+        if (!schedMap.has(rs.id) && !isDuplicate) {
+          schedMap.set(rs.id, rs);
+        }
+      });
+      storage.saveSchedule(Array.from(schedMap.values()));
+
+      // 4. Merge Sessions (Deduplicate by ID)
+      const localSessions = storage.getSessions();
+      const remoteSessions = (remote.sessions && Array.isArray(remote.sessions) ? remote.sessions : []) as FocusSession[];
+      const sessionMap = new Map<string, FocusSession>();
+      localSessions.forEach(s => sessionMap.set(s.id, s));
+      remoteSessions.forEach(rs => {
+        if (!sessionMap.has(rs.id)) sessionMap.set(rs.id, rs);
+      });
+      storage.saveSessions(Array.from(sessionMap.values()));
+
+      // 5. Merge Alarms
+      const localAlarms = storage.getAlarms();
+      const remoteAlarms = (remote.alarms && Array.isArray(remote.alarms) ? remote.alarms : []) as AlarmItem[];
+      const alarmMap = new Map<string, AlarmItem>();
+      localAlarms.forEach(a => alarmMap.set(a.id, a));
+      remoteAlarms.forEach(ra => {
+        if (!alarmMap.has(ra.id)) alarmMap.set(ra.id, ra);
+      });
+      storage.saveAlarms(Array.from(alarmMap.values()));
+
+      // 6. Merge Custom Timers
+      const localTimers = storage.getCustomTimers();
+      const remoteTimers = (remote.customTimers && Array.isArray(remote.customTimers) ? remote.customTimers : []) as CustomTimerItem[];
+      const timerMap = new Map<string, CustomTimerItem>();
+      localTimers.forEach(t => timerMap.set(t.id, t));
+      remoteTimers.forEach(rt => {
+        if (!timerMap.has(rt.id)) timerMap.set(rt.id, rt);
+      });
+      storage.saveCustomTimers(Array.from(timerMap.values()));
+
+      notifySync();
+      return true;
+    } catch {
+      return false;
+    }
+  },
   importAllData: (jsonData: string): boolean => {
     try {
       const parsed = JSON.parse(jsonData);

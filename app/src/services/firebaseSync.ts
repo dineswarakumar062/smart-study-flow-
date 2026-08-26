@@ -11,6 +11,7 @@ import {
 import {
   getFirestore,
   doc,
+  getDoc,
   onSnapshot,
   setDoc,
   serverTimestamp,
@@ -73,6 +74,80 @@ export const signOutOfFirebase = async () => {
   if (services) await signOut(services.auth);
 };
 
+export const uploadDeviceDataToCloud = async (): Promise<{ success: boolean; message: string }> => {
+  const services = getFirebaseServices();
+  if (!services || !services.auth.currentUser || !database) {
+    return { success: false, message: 'Please sign in to your cloud account first.' };
+  }
+  try {
+    const user = services.auth.currentUser;
+    const localData = storage.getAllData();
+    await setDoc(doc(database, 'users', user.uid), {
+      ...localData,
+      updatedAt: serverTimestamp(),
+      updatedBy: storage.getSettings().deviceSyncId,
+    });
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    storage.setLastCloudUpload(timestamp);
+    storage.clearPendingCloudSync();
+    return { success: true, message: `Uploaded this device's data to cloud at ${timestamp}!` };
+  } catch (err: any) {
+    return { success: false, message: err?.message || 'Failed to upload data to cloud.' };
+  }
+};
+
+export const downloadCloudDataToDevice = async (): Promise<{ success: boolean; message: string }> => {
+  const services = getFirebaseServices();
+  if (!services || !services.auth.currentUser || !database) {
+    return { success: false, message: 'Please sign in to your cloud account first.' };
+  }
+  try {
+    const user = services.auth.currentUser;
+    const snapshot = await getDoc(doc(database, 'users', user.uid));
+    if (!snapshot.exists()) {
+      return { success: false, message: 'No cloud backup found for this account yet.' };
+    }
+    const cloudData = snapshot.data();
+    const success = storage.importAllData(JSON.stringify(cloudData));
+    if (!success) {
+      return { success: false, message: 'Failed to apply cloud data to this device.' };
+    }
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    storage.setLastCloudDownload(timestamp);
+    storage.clearPendingCloudSync();
+    return { success: true, message: `Loaded latest cloud data onto this device at ${timestamp}!` };
+  } catch (err: any) {
+    return { success: false, message: err?.message || 'Failed to download data from cloud.' };
+  }
+};
+
+export const safeMergeCloudAndDevice = async (): Promise<{ success: boolean; message: string }> => {
+  const services = getFirebaseServices();
+  if (!services || !services.auth.currentUser || !database) {
+    return { success: false, message: 'Please sign in to your cloud account first.' };
+  }
+  try {
+    const user = services.auth.currentUser;
+    const snapshot = await getDoc(doc(database, 'users', user.uid));
+    if (snapshot.exists()) {
+      storage.mergeAllData(snapshot.data());
+    }
+    const mergedData = storage.getAllData();
+    await setDoc(doc(database, 'users', user.uid), {
+      ...mergedData,
+      updatedAt: serverTimestamp(),
+      updatedBy: storage.getSettings().deviceSyncId,
+    });
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    storage.setLastCloudUpload(timestamp);
+    storage.setLastCloudDownload(timestamp);
+    storage.clearPendingCloudSync();
+    return { success: true, message: `Merged device and cloud data without erasing anything at ${timestamp}!` };
+  } catch (err: any) {
+    return { success: false, message: err?.message || 'Failed to merge cloud and device data.' };
+  }
+};
+
 export function startFirebaseRealtimeSync(
   onRemoteData: (data: string) => void,
   onStatus: (status: FirebaseSyncStatus) => void,
@@ -125,7 +200,8 @@ export function startFirebaseRealtimeSync(
       }
       if (snapshot.exists()) {
         applyingRemote = true;
-        onRemoteData(JSON.stringify(snapshot.data()));
+        storage.mergeAllData(snapshot.data());
+        onRemoteData(JSON.stringify(storage.getAllData()));
         storage.clearPendingCloudSync();
         queueMicrotask(() => { applyingRemote = false; });
       } else {
@@ -151,3 +227,4 @@ export function startFirebaseRealtimeSync(
     window.removeEventListener('online', handleOnline);
   };
 }
+
