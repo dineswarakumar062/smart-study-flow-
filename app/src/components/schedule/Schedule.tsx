@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { CalendarDays, ChevronLeft, Clock, MapPin, Plus, Trash2, User, Edit2 } from 'lucide-react';
+import { CalendarDays, ChevronLeft, Clock, MapPin, Plus, Trash2, User, Edit2, Sparkles, Edit3, X } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import type { ClassSchedule } from '../../types';
+import { AITimetableModal } from './AITimetableModal';
 
 const days: ClassSchedule['dayOfWeek'][] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -25,6 +26,8 @@ export const Schedule: React.FC = () => {
   const currentDay = days[(new Date().getDay() + 6) % 7];
   const [selectedDay, setSelectedDay] = useState<ClassSchedule['dayOfWeek']>(currentDay);
   const [showClassModal, setShowClassModal] = useState(false);
+  const [showAIScanModal, setShowAIScanModal] = useState(false);
+  const [speedDialOpen, setSpeedDialOpen] = useState(false);
   const [editingClassId, setEditingClassId] = useState<string | null>(null);
   const [subjectName, setSubjectName] = useState('');
   const [code, setCode] = useState('');
@@ -47,10 +50,16 @@ export const Schedule: React.FC = () => {
   const selectedClasses = schedule.filter(item => item.dayOfWeek === selectedDay).sort((a, b) => a.startTime.localeCompare(b.startTime));
 
   const openAddClassModal = () => {
+    setSpeedDialOpen(false);
     setEditingClassId(null);
     setSubjectName(''); setCode(''); setInstructor(''); setLocation('');
     setDayOfWeek(selectedDay); setStartTime('10:00'); setEndTime('11:30');
     setShowClassModal(true);
+  };
+
+  const openAIScanModal = () => {
+    setSpeedDialOpen(false);
+    setShowAIScanModal(true);
   };
 
   const openEditClassModal = (item: ClassSchedule) => {
@@ -71,8 +80,15 @@ export const Schedule: React.FC = () => {
     setSelectedDay(dayOfWeek); setShowClassModal(false);
   };
 
+  const handleBatchImport = (classes: Omit<ClassSchedule, 'id'>[]) => {
+    classes.forEach(c => addClass(c));
+    if (classes.length > 0) {
+      setSelectedDay(classes[0].dayOfWeek);
+    }
+  };
+
   return (
-    <div className="schedule-page mx-auto min-h-full max-w-5xl px-4 pb-28 pt-6 sm:px-8 sm:pb-10 sm:pt-10">
+    <div className="schedule-page mx-auto min-h-full max-w-5xl px-4 pb-28 pt-6 sm:px-8 sm:pb-10 sm:pt-10 relative">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-bold text-slate-500 dark:text-slate-400">{getGreeting()}</p>
@@ -93,8 +109,16 @@ export const Schedule: React.FC = () => {
             <CalendarDays className="h-12 w-12" />
           </div>
           <h2 className="mt-6 text-2xl font-black text-slate-950 dark:text-white">No classes on this day</h2>
-          <p className="mt-2 max-w-sm text-sm font-semibold leading-relaxed text-slate-500 dark:text-slate-400">Add a course with its weekly schedule and sessions will appear here automatically.</p>
-          <button type="button" onClick={openAddClassModal} className="glass-primary-button mt-6 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-black shadow-md"><Plus className="h-5 w-5" />Add Course</button>
+          <p className="mt-2 max-w-sm text-sm font-semibold leading-relaxed text-slate-500 dark:text-slate-400">Add a course manually or scan your weekly timetable image/PDF with AI.</p>
+          
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
+            <button type="button" onClick={openAddClassModal} className="glass-primary-button inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black shadow-md">
+              <Plus className="h-4 w-4" />Manual Add
+            </button>
+            <button type="button" onClick={openAIScanModal} className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-indigo-600/25 hover:from-purple-500 hover:to-indigo-500 transition-all active:scale-95">
+              <Sparkles className="h-4 w-4" />AI Scan Timetable
+            </button>
+          </div>
         </div>
       ) : (
         <section className="mt-8 space-y-4">
@@ -103,7 +127,15 @@ export const Schedule: React.FC = () => {
               <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-600 dark:text-indigo-300">Your day</p>
               <h2 className="mt-1 text-2xl font-black text-slate-950 dark:text-white">{selectedClasses.length} {selectedClasses.length === 1 ? 'class' : 'classes'}</h2>
             </div>
-            <button type="button" onClick={openAddClassModal} className="glass-primary-button inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-black shadow-md"><Plus className="h-4 w-4" />Add Course</button>
+            
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={openAIScanModal} className="hidden sm:inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-xs font-black bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60 shadow-xs hover:bg-purple-100 transition-colors">
+                <Sparkles className="h-3.5 w-3.5" />Scan Timetable
+              </button>
+              <button type="button" onClick={openAddClassModal} className="glass-primary-button inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-black shadow-md">
+                <Plus className="h-4 w-4" />Add Course
+              </button>
+            </div>
           </div>
           <div className="space-y-3">
             {selectedClasses.map(item => (
@@ -133,9 +165,125 @@ export const Schedule: React.FC = () => {
         </section>
       )}
 
-      <button type="button" onClick={openAddClassModal} aria-label="Add course" className="glass-fab"><Plus className="h-7 w-7" /></button>
+      {/* =========================================================================
+          SPEED-DIAL FLOATING ACTION BUTTON (2 Floating Options)
+          ========================================================================= */}
+      <div className="fixed bottom-24 right-5 sm:bottom-8 sm:right-8 z-40 flex flex-col items-end gap-3">
+        
+        {/* Speed-Dial Menu Options */}
+        {speedDialOpen && (
+          <div className="flex flex-col items-end gap-2.5 animate-fade-in">
+            {/* Option 1: AI Timetable Scan */}
+            <button
+              type="button"
+              onClick={openAIScanModal}
+              className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-xs shadow-xl hover:scale-105 active:scale-95 transition-all border border-white/20"
+            >
+              <span>Scan Timetable (Image/PDF)</span>
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-amber-300" />
+              </div>
+            </button>
 
-      {showClassModal && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/28 p-4"><div className="liquid-glass-panel max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[2rem] p-6 shadow-2xl sm:p-8"><h3 className="text-2xl font-black text-slate-950 dark:text-white">{editingClassId ? 'Edit course' : 'Add course'}</h3><form onSubmit={handleSaveClassSubmit} className="mt-6 space-y-4"><div><label className="glass-label">Course name</label><input required value={subjectName} onChange={event => setSubjectName(event.target.value)} className="glass-input" placeholder="e.g. Operating Systems" /></div><div className="grid grid-cols-2 gap-4"><div><label className="glass-label">Course code</label><input value={code} onChange={event => setCode(event.target.value)} className="glass-input" placeholder="CS 320" /></div><div><label className="glass-label">Instructor</label><input value={instructor} onChange={event => setInstructor(event.target.value)} className="glass-input" placeholder="Dr. Taylor" /></div></div><div><label className="glass-label">Location</label><input value={location} onChange={event => setLocation(event.target.value)} className="glass-input" placeholder="Lecture Hall 4B" /></div><div className="grid grid-cols-3 gap-3"><div><label className="glass-label">Day</label><select value={dayOfWeek} onChange={event => setDayOfWeek(event.target.value as ClassSchedule['dayOfWeek'])} className="glass-input">{days.map(day => <option key={day}>{day}</option>)}</select></div><div><label className="glass-label">Start</label><input required type="time" value={startTime} onChange={event => setStartTime(event.target.value)} className="glass-input" /></div><div><label className="glass-label">End</label><input required type="time" value={endTime} onChange={event => setEndTime(event.target.value)} className="glass-input" /></div></div><div className="flex justify-end gap-3 pt-3"><button type="button" onClick={() => setShowClassModal(false)} className="glass-secondary-button">Cancel</button><button type="submit" className="glass-primary-button">{editingClassId ? 'Save changes' : 'Add course'}</button></div></form></div></div>}
+            {/* Option 2: Manual Add Course */}
+            <button
+              type="button"
+              onClick={openAddClassModal}
+              className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-black text-xs shadow-xl hover:scale-105 active:scale-95 transition-all border border-indigo-200 dark:border-slate-700"
+            >
+              <span>Manual Course Entry</span>
+              <div className="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <Edit3 className="w-4 h-4" />
+              </div>
+            </button>
+          </div>
+        )}
+
+        {/* Main Floating Trigger Button */}
+        <button
+          type="button"
+          onClick={() => setSpeedDialOpen(!speedDialOpen)}
+          aria-label="Add course options"
+          className={`h-14 w-14 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 ${
+            speedDialOpen
+              ? 'bg-rose-500 text-white rotate-45'
+              : 'bg-[#4338ca] text-white shadow-indigo-600/35'
+          }`}
+        >
+          <Plus className="h-7 w-7" />
+        </button>
+      </div>
+
+      {/* Modal: Manual Course Entry / Edit */}
+      {showClassModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-xs p-4">
+          <div className="relative overflow-hidden w-full max-w-lg rounded-[2rem] p-6 sm:p-8 shadow-2xl border border-indigo-200/90 dark:border-indigo-800/60 bg-gradient-to-br from-indigo-50/95 via-purple-50/50 to-white/95 dark:from-indigo-950/45 dark:via-purple-950/25 dark:to-slate-900/90 max-h-[90vh] overflow-y-auto">
+            <div className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-indigo-400/20 dark:bg-indigo-500/10 blur-2xl pointer-events-none" />
+            
+            <div className="flex items-center justify-between relative z-10">
+              <h3 className="text-2xl font-black text-slate-950 dark:text-white font-headline">
+                {editingClassId ? 'Edit course' : 'Add course'}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowClassModal(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-xl"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveClassSubmit} className="mt-6 space-y-4 relative z-10">
+              <div>
+                <label className="glass-label">Course name</label>
+                <input required value={subjectName} onChange={event => setSubjectName(event.target.value)} className="glass-input" placeholder="e.g. Operating Systems" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="glass-label">Course code</label>
+                  <input value={code} onChange={event => setCode(event.target.value)} className="glass-input" placeholder="CS 320" />
+                </div>
+                <div>
+                  <label className="glass-label">Instructor</label>
+                  <input value={instructor} onChange={event => setInstructor(event.target.value)} className="glass-input" placeholder="Dr. Taylor" />
+                </div>
+              </div>
+              <div>
+                <label className="glass-label">Location</label>
+                <input value={location} onChange={event => setLocation(event.target.value)} className="glass-input" placeholder="Lecture Hall 4B" />
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="glass-label">Day</label>
+                  <select value={dayOfWeek} onChange={event => setDayOfWeek(event.target.value as ClassSchedule['dayOfWeek'])} className="glass-input">
+                    {days.map(day => <option key={day}>{day}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="glass-label">Start</label>
+                  <input required type="time" value={startTime} onChange={event => setStartTime(event.target.value)} className="glass-input" />
+                </div>
+                <div>
+                  <label className="glass-label">End</label>
+                  <input required type="time" value={endTime} onChange={event => setEndTime(event.target.value)} className="glass-input" />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-3">
+                <button type="button" onClick={() => setShowClassModal(false)} className="glass-secondary-button">Cancel</button>
+                <button type="submit" className="glass-primary-button">{editingClassId ? 'Save changes' : 'Add course'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: AI Timetable Scanner */}
+      <AITimetableModal
+        open={showAIScanModal}
+        onClose={() => setShowAIScanModal(false)}
+        onImportClasses={handleBatchImport}
+      />
     </div>
   );
 };
+
