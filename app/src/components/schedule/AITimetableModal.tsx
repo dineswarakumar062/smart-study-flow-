@@ -108,7 +108,16 @@ export const AITimetableModal: React.FC<AITimetableModalProps> = ({
       return;
     }
 
-    const classesToImport = selected.map(({ selected: _, ...rest }) => rest);
+    const classesToImport = selected.map((item) => ({
+      subjectName: item.subjectName,
+      code: item.code,
+      instructor: item.instructor,
+      location: item.location,
+      dayOfWeek: item.dayOfWeek,
+      startTime: item.startTime,
+      endTime: item.endTime,
+      color: item.color,
+    }));
     onImportClasses(classesToImport);
 
     confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });

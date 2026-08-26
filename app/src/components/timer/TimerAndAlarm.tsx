@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useApp } from '../../context/AppContext';
 import { storage } from '../../services/storage';
 import type { CustomTimerItem, TimerColorTheme } from '../../types';
@@ -75,14 +75,16 @@ export const TimerAndAlarm: React.FC = () => {
   const [activeTimerId, setActiveTimerId] = useState<string>(customTimers[0]?.id || 'timer-pomodoro');
   
   // Active Timer state
-  const activeTimer = customTimers.find(t => t.id === activeTimerId) || customTimers[0] || {
-    id: 'timer-default',
-    name: 'Pomodoro Focus',
-    durationMinutes: 25,
-    type: 'focus',
-    colorTheme: 'orange',
-    createdAt: new Date().toISOString(),
-  };
+  const activeTimer = useMemo(() => {
+    return customTimers.find(t => t.id === activeTimerId) || customTimers[0] || {
+      id: 'timer-default',
+      name: 'Pomodoro Focus',
+      durationMinutes: 25,
+      type: 'focus' as const,
+      colorTheme: 'orange' as const,
+      createdAt: new Date().toISOString(),
+    };
+  }, [customTimers, activeTimerId]);
 
   const [timeLeft, setTimeLeft] = useState<number>(activeTimer.durationMinutes * 60);
   const [isRunning, setIsRunning] = useState(false);
@@ -109,10 +111,10 @@ export const TimerAndAlarm: React.FC = () => {
   useEffect(() => {
     setTimeLeft(activeTimer.durationMinutes * 60);
     setIsRunning(false);
-  }, [activeTimerId]);
+  }, [activeTimer.id, activeTimer.durationMinutes]);
 
   // Web Audio Alarm Chime
-  const playAlarmSound = () => {
+  const playAlarmSound = useCallback(() => {
     if (!settings.soundEnabled) return;
     try {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -133,7 +135,7 @@ export const TimerAndAlarm: React.FC = () => {
     } catch {
       // Audio context error
     }
-  };
+  }, [settings.soundEnabled]);
 
   // Timer Tick Interval
   useEffect(() => {
@@ -169,7 +171,7 @@ export const TimerAndAlarm: React.FC = () => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isRunning, activeTimer]);
+  }, [isRunning, activeTimer.name, activeTimer.durationMinutes, activeTimer.type, logSession, playAlarmSound, settings.notificationsEnabled]);
 
   const handleReset = () => {
     setIsRunning(false);

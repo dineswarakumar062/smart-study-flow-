@@ -166,7 +166,7 @@ export const NotesAndTasks: React.FC = () => {
         editorRef.current.innerHTML = formattedHtml;
       }
     }
-  }, [fullPageNote?.id, noteMode]);
+  }, [fullPageNote?.id, fullPageNote?.content, noteMode]);
 
   // Notes filtering by category, search query, and active tag
   const filteredNotes = notes.filter(note => {

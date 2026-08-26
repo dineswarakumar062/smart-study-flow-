@@ -149,7 +149,7 @@ Ensure:
     const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
     rawParsed = JSON.parse(cleanedText);
     if (!Array.isArray(rawParsed)) rawParsed = [];
-  } catch (err) {
+  } catch {
     throw new Error('Failed to parse timetable response from AI. Please ensure the image is clear.');
   }
 
