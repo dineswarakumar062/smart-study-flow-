@@ -42,6 +42,7 @@ interface AppContextType {
   togglePinNote: (id: string) => void;
   schedule: ClassSchedule[];
   addClass: (item: Omit<ClassSchedule, 'id'>) => void;
+  batchAddClasses: (items: Omit<ClassSchedule, 'id'>[]) => void;
   updateClass: (id: string, updated: Partial<ClassSchedule>) => void;
   deleteClass: (id: string) => void;
   sessions: FocusSession[];
@@ -240,9 +241,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addClass = (item: Omit<ClassSchedule, 'id'>) => {
     const newClass: ClassSchedule = {
       ...item,
-      id: 'class_' + Date.now(),
+      id: 'class_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
     };
     const updated = [...schedule, newClass];
+    setSchedule(updated);
+    storage.saveSchedule(updated);
+  };
+
+  const batchAddClasses = (items: Omit<ClassSchedule, 'id'>[]) => {
+    if (!items || items.length === 0) return;
+    const newClasses: ClassSchedule[] = items.map((item, idx) => ({
+      ...item,
+      id: 'class_' + Date.now() + '_' + idx + '_' + Math.random().toString(36).slice(2, 7),
+    }));
+    const updated = [...schedule, ...newClasses];
     setSchedule(updated);
     storage.saveSchedule(updated);
   };
@@ -355,6 +367,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       togglePinNote,
       schedule,
       addClass,
+      batchAddClasses,
       updateClass,
       deleteClass,
       sessions,

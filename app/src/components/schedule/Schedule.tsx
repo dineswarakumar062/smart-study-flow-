@@ -22,7 +22,7 @@ const getGreeting = () => {
 };
 
 export const Schedule: React.FC = () => {
-  const { schedule, addClass, updateClass, deleteClass } = useApp();
+  const { schedule, addClass, batchAddClasses, updateClass, deleteClass } = useApp();
   const currentDay = days[(new Date().getDay() + 6) % 7];
   const [selectedDay, setSelectedDay] = useState<ClassSchedule['dayOfWeek']>(currentDay);
   const [showClassModal, setShowClassModal] = useState(false);
@@ -81,7 +81,7 @@ export const Schedule: React.FC = () => {
   };
 
   const handleBatchImport = (classes: Omit<ClassSchedule, 'id'>[]) => {
-    classes.forEach(c => addClass(c));
+    batchAddClasses(classes);
     if (classes.length > 0) {
       setSelectedDay(classes[0].dayOfWeek);
     }
